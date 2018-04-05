@@ -20,13 +20,11 @@ const Int_t kMaxHit = 2000;
 
 
 Float_t fCalcInvMass(Float_t px1, Float_t py1, Float_t pz1, Float_t px2, Float_t py2, Float_t pz2){
-  //cout << "ERROR: Die Funktion fCalcInvMass muss erst noch geschrieben werden (Press Strg+C)" << endl;
-  return 0;
+  return sqrt(2.*(sqrt(px1*px1+py1*py1+pz1*pz1)*sqrt(px2*px2+py2*py2+pz2*pz2)-px1*px2+py1*py2+pz1*pz2));
 }
 
 Float_t fCalcPT(Float_t px1, Float_t py1, Float_t px2, Float_t py2){
-  //cout << "ERROR: Die Funktion fCalcPT muss erst noch geschrieben werden (Press Strg+C)" << endl;
-  return 0;
+  return sqrt((px1+px2)*(px1+px2)=(py1+py2)*(py1+py2));
 }
 
 

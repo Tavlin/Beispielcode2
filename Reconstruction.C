@@ -67,12 +67,21 @@ void Reconstruction() {
     Float_t py2;
     Float_t pz2;
 
-    for (int i1 = 0; i1 < iCluster[iPufferAktuell]; i1++) {
+    for (int i1 = 0; i1 < iCluster[iPufferAktuell]-1; i1++) { //-1 da man wenn man i1+1 benutzt man bereits bei -1 alle Combis durch hat.
 
       // Paare im selben Event
       // ....
+      px1 = px[iPufferAktuell][i1];
+  	  py1 = py[iPufferAktuell][i1];
+  	  pz1 = pz[iPufferAktuell][i1];
+  	  px2 = px[iPufferAktuell][i1+1];
+  	  py2 = py[iPufferAktuell][i1+1];
+  	  pz2 = pz[iPufferAktuell][i1+1];
 
-
+      pair_pt = fCalcPT(px1,py1,px2,py2);
+      if (pair_pt > 0) {
+          minv = fCalcInvMass(px1,py1,pz1,px2,py2,pz2);
+      }
 
       // Paare aus unterschiedlichen Events (Event Mixing)
       int iPufferAlt;
