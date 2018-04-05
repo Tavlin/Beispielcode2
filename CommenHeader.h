@@ -24,7 +24,7 @@ Float_t fCalcInvMass(Float_t px1, Float_t py1, Float_t pz1, Float_t px2, Float_t
 }
 
 Float_t fCalcPT(Float_t px1, Float_t py1, Float_t px2, Float_t py2){
-  return sqrt((px1+px2)*(px1+px2)=(py1+py2)*(py1+py2));
+  return sqrt((px1+px2)*(px1+px2)+(py1+py2)*(py1+py2));
 }
 
 
@@ -95,7 +95,7 @@ class DataTree{
 
 
 void SetCanvasStandardSettings(TCanvas *cCanv){
-  // gStyle->SetOptStat(0); // <- das hier macht dies box rechts oben weg
+  gStyle->SetOptStat(0); // <- das hier macht dies box rechts oben weg
   cCanv->SetTopMargin(0.025);
   cCanv->SetBottomMargin(0.15);
   cCanv->SetRightMargin(0.05);
@@ -118,11 +118,12 @@ void SetHistoStandardSettings(TH1* histo, Double_t XOffset = 1.2, Double_t YOffs
   histo->GetYaxis()->SetLabelFont(43);
   histo->GetYaxis()->SetTitleFont(43);
   histo->GetXaxis()->SetTitleFont(43);
+  histo->SetTitle("");
 
 
   histo->SetMarkerStyle(20);
   histo->SetMarkerSize(1.5);
-  histo->SetLineWidth(1.5);
+  histo->SetLineWidth(2);
   histo->SetLineColor(kBlack);
   histo->SetMarkerColor(kBlack);
 }

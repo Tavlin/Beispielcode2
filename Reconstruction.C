@@ -1,17 +1,29 @@
 #include "CommenHeader.h"
 
 void Reconstruction() {
-  // Wir definieren ein Canvas auf das wir malen können
-  TCanvas *cExtractSignal = new TCanvas("cExtractSignal","",800,800);
-  // Wir stellen ein paar grundlegende Settings ein
-  SetCanvasStandardSettings(cExtractSignal);// (diese Funktion ist in ExtractSignal.h definiert)
 
+  TCanvas *cSignal = new TCanvas("cSignal","",800,800);
+  SetCanvasStandardSettings(cSignal);
+  
+  TCanvas *cSignalmix = new TCanvas("cSignalmix","",800,800);
+  SetCanvasStandardSettings(cSignalmix);
+  
+  TCanvas *cSignal_pT = new TCanvas("cSignal_pT","",800,800);
+  SetCanvasStandardSettings(cSignal_pT);
+  
+  TCanvas *cSignalmix_pT = new TCanvas("cSignalmix_pT","",800,800);
+  SetCanvasStandardSettings(cSignalmix_pT);
+  
+  
   TH1F* hSignal = new TH1F("hSignal","invariante Masse",100,0.,0.3);
   SetHistoStandardSettings(hSignal);
+  
   TH1F* hSignalmix = new TH1F("hSignalmix","invariante Masse (mixed events)",100,0.,0.3);
   SetHistoStandardSettings(hSignalmix);
+  
   TH2F* hSignal_pT = new TH2F("hSignal_pT","invariante Masse gegen pT",100,0.,0.3,20,0.,10.);
   SetHistoStandardSettings2(hSignal_pT);
+  
   TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",100,0.,0.3,20,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
 
@@ -78,11 +90,18 @@ void Reconstruction() {
   	  py2 = py[iPufferAktuell][i1+1];
   	  pz2 = pz[iPufferAktuell][i1+1];
 
-      pair_pt = fCalcPT(px1,py1,px2,py2);
+      pair_pt = fCalcPT(px1,py1,px2,py2); //pair_pt_same?
       if (pair_pt > 0) {
-          minv = fCalcInvMass(px1,py1,pz1,px2,py2,pz2);
+          minv = fCalcInvMass(px1,py1,pz1,px2,py2,pz2); //minv_same?
+          hSignal->Fill(minv);
+          hSignal_pT->Fill(minv,pair_pt);
       }
-
+      
+      cSignal->cd();
+      
+      hSignal->Draw("");
+      
+      
       // Paare aus unterschiedlichen Events (Event Mixing)
       int iPufferAlt;
       if (iPufferAktuell == 0) {
@@ -101,10 +120,14 @@ void Reconstruction() {
          pair_pt = fCalcPT(px1,py1,px2,py2);
       	 if (pair_pt > 0) {
       	    minv = fCalcInvMass(px1,py1,pz1,px2,py2,pz2);
+      	    hSignalmix->Fill(minv);
+      	    hSignalmix_pT->Fill(minv,pair_pt);
       	 }
 
          // Fülle Histogramme
          // ....
+         
+         
 
       }
     }
