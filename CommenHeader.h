@@ -152,7 +152,7 @@ void SetHistoStandardSettings2(TH2* histo, Double_t XOffset = 1.2, Double_t YOff
   histo->GetXaxis()->SetTitleOffset(1.4);
   histo->SetYTitle("#it{p}_{T} (GeV/#it{c})");
   histo->GetYaxis()->SetTitleOffset(1.4);
-  histo->SetZTitle("#it{???}");
+  histo->SetZTitle("#it{counts}");
   histo->GetZaxis()->SetTitleOffset(1.4);
   histo->GetZaxis()->SetRangeUser(1.e-10,100.);
   

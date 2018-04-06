@@ -14,6 +14,12 @@ void Reconstruction(TString AddName = "") {
   TCanvas *cSignalmix_pT = new TCanvas("cSignalmix_pT","",1080,1080);
   SetCanvasStandardSettings(cSignalmix_pT);
   
+  TCanvas *cSignal_subtracted = new TCanvas("cSignal_subtracted","",1080,1080);
+  SetCanvasStandardSettings(cSignal_subtracted);
+  
+  TCanvas *cSignal_pT_subtracted = new TCanvas("cSignal_pT_subtracted","",1080,1080);
+  SetCanvasStandardSettings(cSignal_pT_subtracted);
+  
   
   TH1F* hSignal = new TH1F("hSignal","invariante Masse",100,0.,0.3);
   SetHistoStandardSettings(hSignal);
@@ -26,6 +32,12 @@ void Reconstruction(TString AddName = "") {
   
   TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",100,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
+
+  //TH1F* hSignal_subtracted = new TH1F("hSignal_subtracted","invariante Masse (ohne Hintergrund)",100,0.,0.3);
+  //SetHistoStandardSettings(hSignal_subtracted);
+  
+  //TH2F* hSignal_pT_subtracted = new TH2F("hSignal_pT_subtracted","invariante Masse gegen pT (ohne Hintergrund)",100,0.,0.3,40,0.,10.);
+  //SetHistoStandardSettings2(hSignal_pT_subtracted);
 
   TGaxis::SetMaxDigits(3);
   
@@ -81,24 +93,25 @@ void Reconstruction(TString AddName = "") {
     Float_t py2;
     Float_t pz2;
 
-    for (int i1 = 0; i1 < iCluster[iPufferAktuell]-1; i1++) { //-1 da man wenn man i1+1 benutzt man bereits bei -1 alle Combis durch hat.
+    for (int i1 = 0; i1 < iCluster[iPufferAktuell]; i1++) { //-1 da man wenn man i1+1 benutzt man bereits bei -1 alle Combis durch hat.
+    
+      for(int i3 = 0; i3 !=i1 && i3 < iCluster[iPufferAktuell]; i3++){
+        // Paare im selben Event
+        // ....
+        px1 = px[iPufferAktuell][i1];
+    	  py1 = py[iPufferAktuell][i1];
+    	  pz1 = pz[iPufferAktuell][i1];
+    	  px2 = px[iPufferAktuell][i3];
+    	  py2 = py[iPufferAktuell][i3];
+    	  pz2 = pz[iPufferAktuell][i3];
 
-      // Paare im selben Event
-      // ....
-      px1 = px[iPufferAktuell][i1];
-  	  py1 = py[iPufferAktuell][i1];
-  	  pz1 = pz[iPufferAktuell][i1];
-  	  px2 = px[iPufferAktuell][i1+1];
-  	  py2 = py[iPufferAktuell][i1+1];
-  	  pz2 = pz[iPufferAktuell][i1+1];
-
-      pair_pt = fCalcPT(px1,py1,px2,py2); //pair_pt_same?
-      if (pair_pt > 0) {
-          minv = fCalcInvMass(px1,py1,pz1,px2,py2,pz2); //minv_same?
-          hSignal->Fill(minv);
-          hSignal_pT->Fill(minv,pair_pt);
+        pair_pt = fCalcPT(px1,py1,px2,py2); //pair_pt_same?
+        if (pair_pt > 0) {
+            minv = fCalcInvMass(px1,py1,pz1,px2,py2,pz2); //minv_same?
+            hSignal->Fill(minv);
+            hSignal_pT->Fill(minv,pair_pt);
+        }
       }
- 
       // Paare aus unterschiedlichen Events (Event Mixing)
       int iPufferAlt;
       if (iPufferAktuell == 0) {
@@ -136,32 +149,72 @@ void Reconstruction(TString AddName = "") {
   
         
   // Wechsle und Zeichne minv same event 
-      cSignal->cd();
-      hSignal->Draw("");
+  cSignal->cd();
+  cSignal->SetTopMargin(0.075);
+  hSignal->Draw("");
       
-      // Wechsle und Zeichne minv-pt same event
-      cSignal_pT->cd();
-      cSignal_pT->SetRightMargin(0.175);
-      cSignal_pT->SetBottomMargin(0.125);
+  // Wechsle und Zeichne minv-pt same event
+  cSignal_pT->cd();
+  cSignal_pT->SetRightMargin(0.175);
+  cSignal_pT->SetBottomMargin(0.125);
+  gPad->SetLogz();
       
-      hSignal_pT->GetZaxis()->SetRangeUser(1.e0,1.e1);
-      hSignal_pT->Draw("colz");
+  hSignal_pT->GetZaxis()->SetRangeUser(1.e0,1.e4);
+  hSignal_pT->Draw("colz");
   
   // Wechsle und Zeichne minv different event 
-         cSignalmix->cd();
-         hSignalmix->Draw("");
+  cSignalmix->cd();
+  cSignalmix->SetTopMargin(0.075);
+  hSignalmix->Draw("");
           
-         // Wechsle und Zeichne minv-pt different event
-         cSignalmix_pT->cd();
-         cSignalmix_pT->SetRightMargin(0.175);
-         cSignalmix_pT->SetBottomMargin(0.125);
-         gPad->SetLogz();
+  // Wechsle und Zeichne minv-pt different event
+  cSignalmix_pT->cd();
+  cSignalmix_pT->SetRightMargin(0.175);
+  cSignalmix_pT->SetBottomMargin(0.125);
+  gPad->SetLogz();
          
-  hSignalmix_pT->GetZaxis()->SetRangeUser(1.e0,1.e3);
+  hSignalmix_pT->GetZaxis()->SetRangeUser(1.e0,1.e4);
   hSignalmix_pT->Draw("colz");
+  
+  
+  cSignal_subtracted->cd();
+  cSignal_subtracted->SetTopMargin(0.075);
+  
+  TH1F *hSignal_subtracted = (TH1F*) hSignal->Clone();
+  
+  hSignal_subtracted->Add(hSignalmix,-1);
+  hSignal_subtracted->Draw("");
+  
+  
+  cSignal_pT_subtracted->cd();
+  cSignal_pT_subtracted->SetRightMargin(0.175);
+  cSignal_pT_subtracted->SetBottomMargin(0.125);
+  cSignal_pT_subtracted->SetLogz();
+  
+  //TH2F *hSignal_pT_subtracted = (TH2F*) hSignal_pT->Clone();
+  //TH1D *hSignal_pT_projection = hSignal_pT_subtracted->ProjectionX();
+  //TH1D *hSignal_pT_projection_mixed = hSignalmix_pT->ProjectionX();
+  
+  //hSignal_pT_subtracted->Add(hSignal_pT_projection_mixed,-1);
+  
+  //hSignal_pT_subtracted->Add(hSignalmix_pT,-1);
+  //hSignal_pT_subtracted->GetZaxis()->SetRangeUser(1.e-10,1.e1);
+  //hSignal_pT_subtracted->Draw("colz");
   
   cSignal->SaveAs(Form("Simulation/InavrianteMasseSameEvent%s.png", AddName.Data()));
   cSignal_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsSameEvent%s.png", AddName.Data()));
   cSignalmix->SaveAs(Form("Simulation/InvarianteMasseDifferentEvents%s.png", AddName.Data()));
   cSignalmix_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsDifferentEvents%s.png", AddName.Data()));
+  cSignal_subtracted->SaveAs(Form("Simulation/InvarianteMasseSubtracted%s.png", AddName.Data()));
+  cSignal_pT_subtracted->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsSubtracted%s.png", AddName.Data()));
+  
 }
+
+
+
+
+
+
+
+
+
