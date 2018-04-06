@@ -1,17 +1,17 @@
 #include "CommenHeader.h"
 
-void Reconstruction() {
+void Reconstruction(TString AddName = "") {
 
-  TCanvas *cSignal = new TCanvas("cSignal","",800,800);
+  TCanvas *cSignal = new TCanvas("cSignal","",1080,1080);
   SetCanvasStandardSettings(cSignal);
   
-  TCanvas *cSignalmix = new TCanvas("cSignalmix","",800,800);
+  TCanvas *cSignalmix = new TCanvas("cSignalmix","",1080,1080);
   SetCanvasStandardSettings(cSignalmix);
   
-  TCanvas *cSignal_pT = new TCanvas("cSignal_pT","",800,800);
+  TCanvas *cSignal_pT = new TCanvas("cSignal_pT","",1080,1080);
   SetCanvasStandardSettings(cSignal_pT);
   
-  TCanvas *cSignalmix_pT = new TCanvas("cSignalmix_pT","",800,800);
+  TCanvas *cSignalmix_pT = new TCanvas("cSignalmix_pT","",1080,1080);
   SetCanvasStandardSettings(cSignalmix_pT);
   
   
@@ -21,18 +21,20 @@ void Reconstruction() {
   TH1F* hSignalmix = new TH1F("hSignalmix","invariante Masse (mixed events)",100,0.,0.3);
   SetHistoStandardSettings(hSignalmix);
   
-  TH2F* hSignal_pT = new TH2F("hSignal_pT","invariante Masse gegen pT",100,0.,0.3,20,0.,10.);
+  TH2F* hSignal_pT = new TH2F("hSignal_pT","invariante Masse gegen pT",100,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignal_pT);
   
-  TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",100,0.,0.3,20,0.,10.);
+  TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",100,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
 
+  TGaxis::SetMaxDigits(3);
+  
   // read Cluster Tree
   TFile* fDaten = new TFile("pi0_vcal_data.root");
-
+  
 
   const Int_t iPufferMax = 2;
-  Int_t NMaxEvents = 10;
+  Int_t NMaxEvents = 1000;
 
 
   if(fDaten->IsZombie()){
@@ -54,7 +56,7 @@ void Reconstruction() {
     iCluster[i] = 0;
   }
   int iPufferAktuell = 0;
-
+  cout<<"Number of events: "<<NMaxEvents<<endl;
   for (Int_t iEvt=0; iEvt < NMaxEvents; iEvt++) {
     if(iEvt%1000 == 0 && iEvt !=0 ) cout << iEvt/1000 << "x10^3 Events have been analyzed" << endl;
 
@@ -96,12 +98,7 @@ void Reconstruction() {
           hSignal->Fill(minv);
           hSignal_pT->Fill(minv,pair_pt);
       }
-      
-      cSignal->cd();
-      
-      hSignal->Draw("");
-      
-      
+ 
       // Paare aus unterschiedlichen Events (Event Mixing)
       int iPufferAlt;
       if (iPufferAktuell == 0) {
@@ -124,11 +121,6 @@ void Reconstruction() {
       	    hSignalmix_pT->Fill(minv,pair_pt);
       	 }
 
-         // Fülle Histogramme
-         // ....
-         
-         
-
       }
     }
 
@@ -141,4 +133,35 @@ void Reconstruction() {
     }
 
   }
+  
+        
+  // Wechsle und Zeichne minv same event 
+      cSignal->cd();
+      hSignal->Draw("");
+      
+      // Wechsle und Zeichne minv-pt same event
+      cSignal_pT->cd();
+      cSignal_pT->SetRightMargin(0.175);
+      cSignal_pT->SetBottomMargin(0.125);
+      
+      hSignal_pT->GetZaxis()->SetRangeUser(1.e0,1.e1);
+      hSignal_pT->Draw("colz");
+  
+  // Wechsle und Zeichne minv different event 
+         cSignalmix->cd();
+         hSignalmix->Draw("");
+          
+         // Wechsle und Zeichne minv-pt different event
+         cSignalmix_pT->cd();
+         cSignalmix_pT->SetRightMargin(0.175);
+         cSignalmix_pT->SetBottomMargin(0.125);
+         gPad->SetLogz();
+         
+  hSignalmix_pT->GetZaxis()->SetRangeUser(1.e0,1.e3);
+  hSignalmix_pT->Draw("colz");
+  
+  cSignal->SaveAs(Form("Simulation/InavrianteMasseSameEvent%s.png", AddName.Data()));
+  cSignal_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsSameEvent%s.png", AddName.Data()));
+  cSignalmix->SaveAs(Form("Simulation/InvarianteMasseDifferentEvents%s.png", AddName.Data()));
+  cSignalmix_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsDifferentEvents%s.png", AddName.Data()));
 }
