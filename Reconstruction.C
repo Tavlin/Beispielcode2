@@ -2,6 +2,8 @@
 
 void Reconstruction(TString AddName = "") {
 
+  TFile* HistoFile = new TFile("HistoFile.root", "New");
+   
   TCanvas *cSignal = new TCanvas("cSignal","",1080,1080);
   SetCanvasStandardSettings(cSignal);
   
@@ -14,30 +16,25 @@ void Reconstruction(TString AddName = "") {
   TCanvas *cSignalmix_pT = new TCanvas("cSignalmix_pT","",1080,1080);
   SetCanvasStandardSettings(cSignalmix_pT);
   
-  TCanvas *cSignal_subtracted = new TCanvas("cSignal_subtracted","",1080,1080);
-  SetCanvasStandardSettings(cSignal_subtracted);
-  
-  TCanvas *cSignal_pT_subtracted = new TCanvas("cSignal_pT_subtracted","",1080,1080);
-  SetCanvasStandardSettings(cSignal_pT_subtracted);
-  
-  
-  TH1F* hSignal = new TH1F("hSignal","invariante Masse",100,0.,0.3);
+  TCanvas *cRatio = new TCanvas("cRatio", "",1080,1080);
+  SetCanvasStandardSettings(cRatio);
+
+  TH1F* hSignal = new TH1F("hSignal","invariante Masse",100,0.,5.);
   SetHistoStandardSettings(hSignal);
   
-  TH1F* hSignalmix = new TH1F("hSignalmix","invariante Masse (mixed events)",100,0.,0.3);
+  TH1F* hSignalmix = new TH1F("hSignalmix","invariante Masse (mixed events)",100,0.,5.);
   SetHistoStandardSettings(hSignalmix);
+  
+  TH1F* hRatio = new TH1F("hRatio","Ratio",100);
+  SetHistoStandardSettings(hRatio);
+  
+  
   
   TH2F* hSignal_pT = new TH2F("hSignal_pT","invariante Masse gegen pT",100,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignal_pT);
   
   TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",100,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
-
-  //TH1F* hSignal_subtracted = new TH1F("hSignal_subtracted","invariante Masse (ohne Hintergrund)",100,0.,0.3);
-  //SetHistoStandardSettings(hSignal_subtracted);
-  
-  //TH2F* hSignal_pT_subtracted = new TH2F("hSignal_pT_subtracted","invariante Masse gegen pT (ohne Hintergrund)",100,0.,0.3,40,0.,10.);
-  //SetHistoStandardSettings2(hSignal_pT_subtracted);
 
   TGaxis::SetMaxDigits(3);
   
@@ -46,7 +43,7 @@ void Reconstruction(TString AddName = "") {
   
 
   const Int_t iPufferMax = 2;
-  Int_t NMaxEvents = 1000;
+  //Int_t NMaxEvents = 1000;
 
 
   if(fDaten->IsZombie()){
@@ -54,7 +51,7 @@ void Reconstruction(TString AddName = "") {
     return;
   }
   DataTree *Daten = new DataTree(fDaten);
-  // NMaxEvents = Daten->GetNEvents()
+  Int_t NMaxEvents = Daten->GetNEvents();
 
   // Allokiere Arrays in die wir die Cluster schreiben
   Float_t px[iPufferMax][kMaxHit];
@@ -176,37 +173,23 @@ void Reconstruction(TString AddName = "") {
   hSignalmix_pT->GetZaxis()->SetRangeUser(1.e0,1.e4);
   hSignalmix_pT->Draw("colz");
   
+  cRatio->cd();
+  hRatio = (TH1F*)hSignalmix_pT->Clone("hRatio");
+  hRatio->Divide(hSignal_pT);
+  hRatio->Draw();
   
-  cSignal_subtracted->cd();
-  cSignal_subtracted->SetTopMargin(0.075);
-  
-  TH1F *hSignal_subtracted = (TH1F*) hSignal->Clone();
-  
-  hSignal_subtracted->Add(hSignalmix,-1);
-  hSignal_subtracted->Draw("");
-  
-  
-  cSignal_pT_subtracted->cd();
-  cSignal_pT_subtracted->SetRightMargin(0.175);
-  cSignal_pT_subtracted->SetBottomMargin(0.125);
-  cSignal_pT_subtracted->SetLogz();
-  
-  //TH2F *hSignal_pT_subtracted = (TH2F*) hSignal_pT->Clone();
-  //TH1D *hSignal_pT_projection = hSignal_pT_subtracted->ProjectionX();
-  //TH1D *hSignal_pT_projection_mixed = hSignalmix_pT->ProjectionX();
-  
-  //hSignal_pT_subtracted->Add(hSignal_pT_projection_mixed,-1);
-  
-  //hSignal_pT_subtracted->Add(hSignalmix_pT,-1);
-  //hSignal_pT_subtracted->GetZaxis()->SetRangeUser(1.e-10,1.e1);
-  //hSignal_pT_subtracted->Draw("colz");
+  if ( HistoFile->IsOpen() ) printf("HistoFile opened successfully\n");
+  gFile = HistoFile;
+  hSignal_pT->Write("hSignal_pT");
+  hSignalmix_pT->Write("hSignalmix_pT");
   
   cSignal->SaveAs(Form("Simulation/InavrianteMasseSameEvent%s.png", AddName.Data()));
+  cSignalmix->SaveAs(Form("Simulation/InavrianteMasseDifferentEvent%s.png", AddName.Data()));
   cSignal_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsSameEvent%s.png", AddName.Data()));
-  cSignalmix->SaveAs(Form("Simulation/InvarianteMasseDifferentEvents%s.png", AddName.Data()));
   cSignalmix_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsDifferentEvents%s.png", AddName.Data()));
-  cSignal_subtracted->SaveAs(Form("Simulation/InvarianteMasseSubtracted%s.png", AddName.Data()));
-  cSignal_pT_subtracted->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsSubtracted%s.png", AddName.Data()));
+  cRatio->SaveAs(Form("Simulation/Ratio%s.png", AddName.Data()));
+  
+  HistoFile->Close();
   
 }
 

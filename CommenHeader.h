@@ -146,6 +146,8 @@ void SetHistoStandardSettings2(TH2* histo, Double_t XOffset = 1.2, Double_t YOff
   histo->GetYaxis()->SetLabelFont(43);
   histo->GetYaxis()->SetTitleFont(43);
   histo->GetXaxis()->SetTitleFont(43);
+  histo->Sumw2();
+  
   
   histo->SetTitle("");
   histo->SetXTitle("#it{m}_{inv} (GeV/#it{c}^{2})");
