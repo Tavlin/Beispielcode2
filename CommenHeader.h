@@ -120,7 +120,7 @@ void SetHistoStandardSettings(TH1* histo, Double_t XOffset = 1.2, Double_t YOffs
   histo->GetXaxis()->SetTitleFont(43);
   
   histo->SetTitle("");
-  histo->SetXTitle("#it{m}_{inv} (GeV/#it{c}^{2})");
+  histo->SetXTitle("#it{m}_{inv} [GeV/#it{c}^{2}]");
   histo->GetXaxis()->SetTitleOffset(1.4);
   histo->SetYTitle("#it{counts}");
   histo->GetYaxis()->SetTitleOffset(1.4);
@@ -150,9 +150,9 @@ void SetHistoStandardSettings2(TH2* histo, Double_t XOffset = 1.2, Double_t YOff
   
   
   histo->SetTitle("");
-  histo->SetXTitle("#it{m}_{inv} (GeV/#it{c}^{2})");
+  histo->SetXTitle("#it{m}_{inv} [GeV/#it{c}^{2}]");
   histo->GetXaxis()->SetTitleOffset(1.4);
-  histo->SetYTitle("#it{p}_{T} (GeV/#it{c})");
+  histo->SetYTitle("#it{p}_{T} [GeV/#it{c}]");
   histo->GetYaxis()->SetTitleOffset(1.4);
   histo->SetZTitle("#it{counts}");
   histo->GetZaxis()->SetTitleOffset(1.4);

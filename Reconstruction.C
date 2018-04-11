@@ -19,21 +19,21 @@ void Reconstruction(TString AddName = "") {
   TCanvas *cRatio = new TCanvas("cRatio", "",1080,1080);
   SetCanvasStandardSettings(cRatio);
 
-  TH1F* hSignal = new TH1F("hSignal","invariante Masse",100,0.,5.);
+  TH1F* hSignal = new TH1F("hSignal","invariante Masse",300,0.,0.3);
   SetHistoStandardSettings(hSignal);
   
-  TH1F* hSignalmix = new TH1F("hSignalmix","invariante Masse (mixed events)",100,0.,5.);
+  TH1F* hSignalmix = new TH1F("hSignalmix","invariante Masse (mixed events)",300,0.,0.3);
   SetHistoStandardSettings(hSignalmix);
   
-  TH1F* hRatio = new TH1F("hRatio","Ratio",100);
+  TH1F* hRatio = new TH1F("hRatio","Ratio",300,0.,0.3);
   SetHistoStandardSettings(hRatio);
   
   
   
-  TH2F* hSignal_pT = new TH2F("hSignal_pT","invariante Masse gegen pT",100,0.,0.3,40,0.,10.);
+  TH2F* hSignal_pT = new TH2F("hSignal_pT","invariante Masse gegen pT",300,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignal_pT);
   
-  TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",100,0.,0.3,40,0.,10.);
+  TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",300,0.,0.3,40,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
 
   TGaxis::SetMaxDigits(3);
@@ -173,11 +173,24 @@ void Reconstruction(TString AddName = "") {
   hSignalmix_pT->GetZaxis()->SetRangeUser(1.e0,1.e4);
   hSignalmix_pT->Draw("colz");
   
-  cRatio->cd();
-  hRatio = (TH1F*)hSignalmix_pT->Clone("hRatio");
-  hRatio->Divide(hSignal_pT);
-  hRatio->Draw();
   
+  
+  cRatio->cd();
+  // define fit function for ratio
+  TF1* ratio_fit = new TF1("ratio_fit","[0]",0,0.3);
+  ratio_fit->SetLineColor(kRed);
+  
+  
+  
+  // wechsle und zeichne Ratio zwischen same und mixed event
+  hRatio = (TH1F*)hSignalmix->Clone("hRatio");
+  hRatio->Divide(hSignal);
+  hRatio->Fit(ratio_fit,0);
+  hRatio->Draw();
+  ratio_fit->Draw("l,same");
+  
+  
+  //Lese und speichere in Datei namens HistoFile.root
   if ( HistoFile->IsOpen() ) printf("HistoFile opened successfully\n");
   gFile = HistoFile;
   hSignal_pT->Write("hSignal_pT");
@@ -189,7 +202,9 @@ void Reconstruction(TString AddName = "") {
   cSignalmix_pT->SaveAs(Form("Simulation/InvarianteMasseTransversalImpulsDifferentEvents%s.png", AddName.Data()));
   cRatio->SaveAs(Form("Simulation/Ratio%s.png", AddName.Data()));
   
+  // schliesse datei #sauberes Programmieren
   HistoFile->Close();
+  cout << "finished! :)" << endl;
   
 }
 
