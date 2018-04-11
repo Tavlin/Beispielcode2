@@ -20,7 +20,7 @@ const Int_t kMaxHit = 2000;
 
 
 Float_t fCalcInvMass(Float_t px1, Float_t py1, Float_t pz1, Float_t px2, Float_t py2, Float_t pz2){
-  return sqrt(2.*(sqrt(px1*px1+py1*py1+pz1*pz1)*sqrt(px2*px2+py2*py2+pz2*pz2)-px1*px2+py1*py2+pz1*pz2));
+  return sqrt(2.*(sqrt(px1*px1+py1*py1+pz1*pz1)*sqrt(px2*px2+py2*py2+pz2*pz2)-(px1*px2+py1*py2+pz1*pz2)));
 }
 
 Float_t fCalcPT(Float_t px1, Float_t py1, Float_t px2, Float_t py2){
@@ -120,7 +120,7 @@ void SetHistoStandardSettings(TH1* histo, Double_t XOffset = 1.2, Double_t YOffs
   histo->GetXaxis()->SetTitleFont(43);
   
   histo->SetTitle("");
-  histo->SetXTitle("#it{m}_{inv} [GeV/#it{c}^{2}]");
+  histo->SetXTitle("#it{m}_{inv} (GeV/#it{c}^{2})");
   histo->GetXaxis()->SetTitleOffset(1.4);
   histo->SetYTitle("#it{counts}");
   histo->GetYaxis()->SetTitleOffset(1.4);
@@ -150,7 +150,7 @@ void SetHistoStandardSettings2(TH2* histo, Double_t XOffset = 1.2, Double_t YOff
   
   
   histo->SetTitle("");
-  histo->SetXTitle("#it{m}_{inv} [GeV/#it{c}^{2}]");
+  histo->SetXTitle("#it{m}_{inv} (GeV/#it{c}^{2})");
   histo->GetXaxis()->SetTitleOffset(1.4);
   histo->SetYTitle("#it{p}_{T} [GeV/#it{c}]");
   histo->GetYaxis()->SetTitleOffset(1.4);
@@ -171,7 +171,10 @@ void SetLegendSettigns(TLegend* leg){
   leg->SetMargin(0.15);
 }
 
-
+void SetLatexSettings(TLatex* tex){
+  tex->SetTextSize(0.04);
+  tex->SetTextFont(42);
+  }
 
 // gStyle->SetCanvasColor(0);
 // gStyle->SetPadColor(0);
