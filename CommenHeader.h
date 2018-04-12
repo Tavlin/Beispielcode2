@@ -163,17 +163,18 @@ void SetHistoStandardSettings2(TH2* histo, Double_t XOffset = 1.2, Double_t YOff
 
 
 void SetLegendSettigns(TLegend* leg){
-  leg->SetTextSize(50);
-  leg->SetTextFont(43);
+  leg->SetTextFont(42);
+  leg->SetTextSize(0.03);
   leg->SetFillColor(0);
   leg->SetFillStyle(0);
   leg->SetLineWidth(0);
   leg->SetLineColor(0);
   leg->SetMargin(0.15);
+  leg->SetBorderSize(0);
 }
 
 void SetLatexSettings(TLatex* tex){
-  tex->SetTextSize(0.04);
+  tex->SetTextSize(0.03);
   tex->SetTextFont(42);
   }
 

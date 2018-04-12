@@ -2,21 +2,16 @@
 
 void Extraction(TString AddName = ""){
 
-  // Erstellen der Canvas  
-  TCanvas *cSignal_pT = new TCanvas("cSignal_pT","",1080,1080);
-  SetCanvasStandardSettings(cSignal_pT);
-  
-  TCanvas *cSignalmix_pT = new TCanvas("cSignalmix_pT","",1080,1080);
-  SetCanvasStandardSettings(cSignalmix_pT);
-  
+  // Erstellen der Canvas 
   TCanvas *cRatio = new TCanvas("cRatio", "",1080,1080);
   SetCanvasStandardSettings(cRatio);
   
   TCanvas *cSignalSubtracted = new TCanvas("cSignalSubtracted", "",1080,1080);
   SetCanvasStandardSettings(cSignalSubtracted);
   
-  // Erstellen der Legenden
-  TLegend *lSignal_pT_projection_clone = new TLegend(0.5,0.75,0.9,0.95);
+  TCanvas *cSignal = new TCanvas("cSignal", "",1080,1080);
+  SetCanvasStandardSettings(cSignal);
+ 
   
   // Erstellen der Latex-Objekte  
   TLatex *lSignal_pT = new TLatex();
@@ -37,6 +32,8 @@ void Extraction(TString AddName = ""){
   TH1F* hRatio = new TH1F("hRatio","Ratio",150,0.,0.3);
   SetHistoStandardSettings(hRatio);
 
+  TH1F* hSignal = new TH1F("hSignal","Ratio",150,0.,0.3);
+  SetHistoStandardSettings(hSignal);
 
 
   //Open and read file
@@ -61,6 +58,7 @@ void Extraction(TString AddName = ""){
     // make projection
     TH1D* hSignal_pT_projection = hSignal_pT->ProjectionX("hSignal_pT_projection", ip1-1,ip1);
     TH1D* hSignal_pT_mix_projection = hSignalmix_pT->ProjectionX("hSignal_pT_mix_projection", ip1-1,ip1);
+
        
     // Wechsle zur Ratio
     cRatio->cd();
@@ -92,6 +90,8 @@ void Extraction(TString AddName = ""){
       
     }
     
+ 
+    
     hRatio->Fit(ratio_fit,"Q","",0.2,0.3);
     SetHistoStandardSettings(hRatio);
     hRatio->SetYTitle("same event/mixed event");
@@ -111,18 +111,46 @@ void Extraction(TString AddName = ""){
     hSignal_pT_projection_clone->Add(hSignal_pT_mix_projection_clone,-1);
     
     SetHistoStandardSettings(hSignal_pT_projection_clone);
+  
+    // Erstellen der Legenden
+    TLegend *lSignal_pT_projection_clone = new TLegend(0.6,0.75,0.9,0.95);
+    SetLegendSettigns(lSignal_pT_projection_clone);
+    lSignal_pT_projection_clone->AddEntry(hSignal_pT_projection_clone,"#it{m}_{inv} spectrum");
     
-    string ubin = to_string(ip1);
-    string lbin = to_string(ip3);
-    
-    lSignal_pT_projection_clone->AddEntry(hSignal_pT_projection_clone,)
+    TLatex *ltSignal_pT_projection_clone = new TLatex();
+    SetLatexSettings(ltSignal_pT_projection_clone);
     
     hSignal_pT_projection_clone->Draw();
+    lSignal_pT_projection_clone->Draw("same");
+    ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf < #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.25*(double)ip3, 0.25*(double)ip1));
+    
+    cSignal->cd();
+    // Zeichnen von minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund 
+    TH1D* hSignal = hSignal_pT->ProjectionX("hSignal", ip3,ip1);
+    TH1D* hSignal_mix = hSignalmix_pT->ProjectionX("hSignal_mix", ip3,ip1);
+    hSignal_mix->Multiply(ratio_fit);
+    hSignal->SetMarkerStyle(34);
+    hSignal->SetMarkerColor(kBlue);
+    hSignal_mix->SetLineColor(kRed);
+    hSignal->Draw("EP");
+    hSignal_mix->Draw("sameL");
+    
+    // Legende fuer minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund 
+    TLegend *lSignal = new TLegend(0.15,0.75,0.9,0.95);
+    SetLegendSettigns(lSignal);
+    lSignal->AddEntry(hSignal,"#it{m}_{inv} spectrum same event");
+    lSignal->AddEntry(hSignal_mix,"scaled #it{m}_{inv} spectrum mixed event");
+    lSignal->Draw("SAME");
+    
+    // Latex fuer minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund 
+    TLatex *ltSignal = new TLatex();
+    SetLatexSettings(ltSignal);
+    ltSignal->DrawLatexNDC(0.15,0.75,Form("%1.2lf < #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.25*(double)ip3, 0.25*(double)ip1));
     
     
-    cRatio->SaveAs(Form("Extraction/Ratio_pt(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
+    cRatio->SaveAs(Form("Extraction/Ratio(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
     cSignalSubtracted->SaveAs(Form("Extraction/InavrianteMasseOhneHintergrund_pt(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
-    
+    cSignal->SaveAs(Form("Extraction/InavrianteMasseMitHintergrund(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
     ip1 = ip3+1;
 
   }
