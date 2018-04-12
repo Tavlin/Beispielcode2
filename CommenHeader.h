@@ -15,6 +15,7 @@
 #include "TRandom.h"
 #include <TSystem.h>
 #include <iostream>
+#include <string>
 
 const Int_t kMaxHit = 2000;
 

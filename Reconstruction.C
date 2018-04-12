@@ -2,7 +2,7 @@
 
 void Reconstruction(TString AddName = "") {
 
-  TFile* HistoFile = new TFile("HistoFile.root", "UPDATE");
+ 
    
    
   // Erstellen der Canvas
@@ -225,6 +225,7 @@ void Reconstruction(TString AddName = "") {
   
   cSignalSubtracted->cd();
   cSignalSubtracted->SetTopMargin(0.075);
+  
   // gewichten der mixed events mit der ratio_fit
   TH1F* hSignalmix_clone = (TH1F*)hSignalmix->Clone("hSignalmix_clone");
   TH1F* hSignal_clone = (TH1F*)hSignal->Clone("hSignal_clone");
@@ -237,10 +238,10 @@ void Reconstruction(TString AddName = "") {
   
   
   
-  
+  TFile* HistoFile = new TFile("HistoFile.root", "UPDATE");
   //Lese und speichere in Datei namens HistoFile.root
   if ( HistoFile->IsOpen() ) printf("HistoFile opened successfully\n");
-  gFile = HistoFile;
+  //gFile = HistoFile;
   hSignal_pT->Write("hSignal_pT");
   hSignalmix_pT->Write("hSignalmix_pT");
   
