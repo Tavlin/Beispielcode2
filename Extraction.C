@@ -29,11 +29,16 @@ void Extraction(TString AddName = ""){
   
   
   // Erstelle 1D Histogram fuer Ratio
-  TH1F* hRatio = new TH1F("hRatio","Ratio",150,0.,0.3);
+  TH1D* hRatio = new TH1D("hRatio","Ratio",150,0.,0.3);
   SetHistoStandardSettings(hRatio);
 
-  TH1F* hSignal = new TH1F("hSignal","Ratio",150,0.,0.3);
-  SetHistoStandardSettings(hSignal);
+  TH1D* hSignal[40];
+  
+  for(int i = 0; i < 40; i++){
+    
+    hSignal[i] = new TH1D(Form("hSignal[%d]",i),Form("Blubb[%d]",i),150,0.,0.3);
+    SetHistoStandardSettings(hSignal[i]);
+  }
 
 
   //Open and read file
@@ -51,7 +56,8 @@ void Extraction(TString AddName = ""){
   
   
   for(int ip1 = 40; ip1 > 0; ip1--){
-  
+    
+    
     int ip3 = ip1-1;
     int* pip3 = &ip3;
     
@@ -67,7 +73,7 @@ void Extraction(TString AddName = ""){
     ratio_fit->SetLineColor(kRed);
     
     // wechsle und zeichne Ratio zwischen same und mixed event
-    TH1F* hRatio = (TH1F*)hSignal_pT_projection->Clone("hRatio");
+    TH1D* hRatio = (TH1D*)hSignal_pT_projection->Clone("hRatio");
     hRatio->Divide(hSignal_pT_mix_projection);
     
     for(int ip2 = ip1-1; hRatio->GetEntries() < 20 && ip2 >= 0; ip2--){
@@ -81,7 +87,7 @@ void Extraction(TString AddName = ""){
       ratio_fit->SetLineColor(kRed);
       
       // wechsle und zeichne Ratio zwischen same und mixed event
-      hRatio = (TH1F*)hSignal_pT_projection->Clone("hRatio");
+      hRatio = (TH1D*)hSignal_pT_projection->Clone("hRatio");
       hRatio->Divide(hSignal_pT_mix_projection);
       
       
@@ -103,8 +109,8 @@ void Extraction(TString AddName = ""){
     cSignalSubtracted->SetTopMargin(0.075);
     
     // gewichten der mixed events mit der ratio_fit
-    TH1F* hSignal_pT_mix_projection_clone = (TH1F*)hSignal_pT_mix_projection->Clone("hSignal_pT_mix_projection_clone");
-    TH1F* hSignal_pT_projection_clone = (TH1F*)hSignal_pT_projection->Clone("hSignal_pT_projection_clone");
+    TH1D* hSignal_pT_mix_projection_clone = (TH1D*)hSignal_pT_mix_projection->Clone("hSignal_pT_mix_projection_clone");
+    TH1D* hSignal_pT_projection_clone = (TH1D*)hSignal_pT_projection->Clone("hSignal_pT_projection_clone");
     hSignal_pT_mix_projection_clone->Multiply(ratio_fit);
     
     
@@ -126,33 +132,53 @@ void Extraction(TString AddName = ""){
     
     cSignal->cd();
     // Zeichnen von minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund 
-    TH1D* hSignal = hSignal_pT->ProjectionX("hSignal", ip3,ip1);
+    hSignal[ip1] = hSignal_pT->ProjectionX(Form("hSignal[%d]",ip1), ip3,ip1);
     TH1D* hSignal_mix = hSignalmix_pT->ProjectionX("hSignal_mix", ip3,ip1);
     hSignal_mix->Multiply(ratio_fit);
-    hSignal->SetMarkerStyle(34);
-    hSignal->SetMarkerColor(kBlue);
+    hSignal[ip1]->SetMarkerStyle(34);
+    hSignal[ip1]->SetMarkerColor(kBlue);
     hSignal_mix->SetLineColor(kRed);
-    hSignal->Draw("EP");
+    
+    Float_t new_y_max = hSignal[ip1]->GetMaximum()*1.5;
+    hSignal[ip1]->GetYaxis()->SetRangeUser(0,new_y_max);
+    cout << "hSignal[ip1] GetMaximum = " << hSignal[ip1]->GetMaximum()*2 << endl;
+    
+    
+   
+    hSignal[ip1]->Draw("EP");
     hSignal_mix->Draw("sameL");
     
+    
     // Legende fuer minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund 
-    TLegend *lSignal = new TLegend(0.15,0.75,0.9,0.95);
+    TLegend *lSignal = new TLegend(0.175,0.75,0.9,0.95);
     SetLegendSettigns(lSignal);
-    lSignal->AddEntry(hSignal,"#it{m}_{inv} spectrum same event");
+    lSignal->AddEntry(hSignal[ip1],"#it{m}_{inv} spectrum same event");
     lSignal->AddEntry(hSignal_mix,"scaled #it{m}_{inv} spectrum mixed event");
     lSignal->Draw("SAME");
     
     // Latex fuer minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund 
     TLatex *ltSignal = new TLatex();
     SetLatexSettings(ltSignal);
-    ltSignal->DrawLatexNDC(0.15,0.75,Form("%1.2lf < #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.25*(double)ip3, 0.25*(double)ip1));
+    ltSignal->DrawLatexNDC(0.175,0.75,Form("%1.2lf < #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.25*(double)ip3, 0.25*(double)ip1));
     
     
     cRatio->SaveAs(Form("Extraction/Ratio(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
     cSignalSubtracted->SaveAs(Form("Extraction/InavrianteMasseOhneHintergrund_pt(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
     cSignal->SaveAs(Form("Extraction/InavrianteMasseMitHintergrund(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
     ip1 = ip3+1;
-
+    
+    // to be edited
+    TFile* HistoFile = new TFile("HistoFile.root", "UPDATE");
+    //Lese und speichere in Datei namens HistoFile.root
+    if ( HistoFile->IsOpen() ) printf("HistoFile opened successfully\n");
+    
+    hSignal_pT->Write("hSignal_pT");
+    hSignalmix_pT->Write("hSignalmix_pT");
+    
+    // schliesse datei #sauberes Programmieren
+    HistoFile->Close();
+    cout << "finished! :)" << endl;
+  
   }
 
 

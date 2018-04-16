@@ -6,10 +6,13 @@
 
 
 echo "";
-echo "Starte Pi0Simulation.C...";
+
 mkdir -p Simulation
 mkdir -p Extraction
+#echo "Starte Reconstruction.C...";
 #root -q -l -b Reconstruction.C\+\(\)
+
+echo "Starte Extraction.C...";
 root -q -l -b Extraction.C\+\(\)
 # Hier wird ein C++ Macro in root aufgerufen
 # Das + bedeutet, dass wir den code kompilieren wollen (.C+),
