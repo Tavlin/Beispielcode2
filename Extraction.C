@@ -32,7 +32,8 @@ void Extraction(TString AddName = ""){
   TH1D* hRatio = new TH1D("hRatio","Ratio",150,0.,0.3);
   SetHistoStandardSettings(hRatio);
 
-  TH1D* hSignal[40];
+  TH1D* hSignal[41];
+  TH1D* hSignal_pT_projection_clone[41];
 
   for(int i = 0; i < 40; i++){
 
@@ -110,23 +111,23 @@ void Extraction(TString AddName = ""){
 
     // gewichten der mixed events mit der ratio_fit
     TH1D* hSignal_pT_mix_projection_clone = (TH1D*)hSignal_pT_mix_projection->Clone("hSignal_pT_mix_projection_clone");
-    TH1D* hSignal_pT_projection_clone = (TH1D*)hSignal_pT_projection->Clone("hSignal_pT_projection_clone");
+    hSignal_pT_projection_clone[ip1] = (TH1D*)hSignal_pT_projection->Clone("hSignal_pT_projection_clone");
     hSignal_pT_mix_projection_clone->Multiply(ratio_fit);
 
 
-    hSignal_pT_projection_clone->Add(hSignal_pT_mix_projection_clone,-1);
+    hSignal_pT_projection_clone[ip1]->Add(hSignal_pT_mix_projection_clone,-1);
 
-    SetHistoStandardSettings(hSignal_pT_projection_clone);
+    SetHistoStandardSettings(hSignal_pT_projection_clone[ip1]);
 
     // Erstellen der Legenden
     TLegend *lSignal_pT_projection_clone = new TLegend(0.6,0.75,0.9,0.95);
     SetLegendSettigns(lSignal_pT_projection_clone);
-    lSignal_pT_projection_clone->AddEntry(hSignal_pT_projection_clone,"#it{m}_{inv} spectrum");
+    lSignal_pT_projection_clone->AddEntry(hSignal_pT_projection_clone[ip1],"#it{m}_{inv} spectrum");
 
     TLatex *ltSignal_pT_projection_clone = new TLatex();
     SetLatexSettings(ltSignal_pT_projection_clone);
 
-    hSignal_pT_projection_clone->Draw();
+    hSignal_pT_projection_clone[ip1]->Draw();
     lSignal_pT_projection_clone->Draw("same");
     ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf < #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.25*(double)ip3, 0.25*(double)ip1));
 
@@ -174,11 +175,11 @@ void Extraction(TString AddName = ""){
   //if ( HistoWOBackground_file->IsOpen() ) printf("HistoWOBackground_file opened successfully\n");
 
   for (size_t k = 1; k <= 26; k++) {
-    hSignal[k]->Write(Form("hSignal[%lu]",k));
+    hSignal_pT_projection_clone[k]->Write(Form("hSignal[%lu]",k));
   }
-  hSignal[28]->Write("hSignal[27]");
-  hSignal[32]->Write("hSignal[28]");
-  hSignal[40]->Write("hSignal[29]");
+  hSignal_pT_projection_clone[28]->Write("hSignal[27]");
+  hSignal_pT_projection_clone[32]->Write("hSignal[28]");
+  hSignal_pT_projection_clone[40]->Write("hSignal[29]");
 
   // schliesse datei #sauberes Programmieren
   HistoWOBackground_file->Close();

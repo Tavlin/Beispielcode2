@@ -31,14 +31,26 @@ void P_TSpectrumExtraction(TString AddName = ""){
   TH1D* hSignal[28];
 
   TH1D* hMinvSpectra[28];
+
+  // Deklarieren der Fit Funktionen
   TF1* fGausFit[28];
 
   for(int i = 0; i < 28; i++){
 
+    // definieren und auslesen der Histos
     hMinvSpectra[i] = new TH1D(Form("hMinvSpectra[%d]",i),Form("#it{m}_{inv} spectra [%d]",i),150,0.,0.3);
     SetHistoStandardSettings(hMinvSpectra[i]);
-    gDirectory->GetObject(Form("hMinvSpectra[%d]",i),hSignal[i]);
-    hMinvSpectra[i]->Fit("gaus(0)");
+    //gDirectory->GetObject(Form("hMinvSpectra[%d]",i),hSignal[i+1]);
+    gDirectory->GetObject(Form("hSignal[%d]",i+1),hMinvSpectra[i]);
+
+    // Definieren der Fits und fitten
+    fGausFit[i] = new TF1(Form("fGausFit[%d]",i),"gaus", 0, 0.3);
+    fGausFit[i]->SetParLimits(1,0.1,0.15);
+    fGausFit[i]->SetParLimits(0,0.,10e6);
+    hMinvSpectra[i]->Fit(Form("fGausFit[%d]",i),"MR","", 0, 0.3);
+
+    hMinvSpectra[i]->Draw();
+    cP_TSpectrum->SaveAs(Form("P_T_Spectra/P_TSpectra(%d).png",i));
   }
 
 
