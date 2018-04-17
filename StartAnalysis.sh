@@ -12,8 +12,11 @@ mkdir -p Extraction
 #echo "Starte Reconstruction.C...";
 #root -q -l -b Reconstruction.C\+\(\)
 
-echo "Starte Extraction.C...";
-root -q -l -b Extraction.C\+\(\)
+# echo "Starte Extraction.C...";
+# root -q -l -b Extraction.C\+\(\)
+
+echo "Starte P_TSpectrumExtraction.C...";
+root -q -l -b P_TSpectrumExtraction.C\+\(\)
 # Hier wird ein C++ Macro in root aufgerufen
 # Das + bedeutet, dass wir den code kompilieren wollen (.C+),
 #         die \ werden nur verwendet, da einige symbole in bash

@@ -141,7 +141,7 @@ void Extraction(TString AddName = ""){
 
     Float_t new_y_max = hSignal[ip1]->GetMaximum()*1.5;
     hSignal[ip1]->GetYaxis()->SetRangeUser(0,new_y_max);
-    cout << "hSignal[ip1] GetMaximum = " << hSignal[ip1]->GetMaximum()*2 << endl;
+    cout << "hSignal[" << ip1 << "] GetMaximum = " << hSignal[ip1]->GetMaximum()*2 << endl;
 
 
 
@@ -167,18 +167,22 @@ void Extraction(TString AddName = ""){
     cSignal->SaveAs(Form("Extraction/InavrianteMasseMitHintergrund(%1.2lf-%1.2lf).png", 0.25*(double)ip3, 0.25*(double)ip1));
     ip1 = ip3+1;
 
-    TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "UPDATE");
-    //Lese und speichere in Datei namens HistoFile.root
-    if ( HistoWOBackground_file->IsOpen() ) printf("HistoWOBackground_file opened successfully\n");
-
-    hSignal[ip1]->Write(Form("hSignal[%d]",ip1));
-
-    // schliesse datei #sauberes Programmieren
-    HistoWOBackground_file->Close();
-    cout << "finished! :)" << endl;
-
   }
 
+  TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "UPDATE");
+  //Lese und speichere in Datei namens HistoFile.root
+  //if ( HistoWOBackground_file->IsOpen() ) printf("HistoWOBackground_file opened successfully\n");
+
+  for (size_t k = 1; k <= 26; k++) {
+    hSignal[k]->Write(Form("hSignal[%lu]",k));
+  }
+  hSignal[28]->Write("hSignal[27]");
+  hSignal[32]->Write("hSignal[28]");
+  hSignal[40]->Write("hSignal[29]");
+
+  // schliesse datei #sauberes Programmieren
+  HistoWOBackground_file->Close();
+  cout << "finished! :)" << endl;
 
 
 
