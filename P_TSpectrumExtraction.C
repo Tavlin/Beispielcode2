@@ -31,6 +31,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
   TH1D* hSignal[28];
 
   TH1D* hMinvSpectra[28];
+  TF1* fGausFit[28];
 
   for(int i = 0; i < 28; i++){
 
