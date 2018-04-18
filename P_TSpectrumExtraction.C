@@ -62,7 +62,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
   Double_t integral_value[29];
   Double_t int_error[29];
   Double_t integral_value_fit[29];
-
+  Double_t ymin, ymax;
   cplayceholder->cd();
   for(int i = 0; i < 29; i++){
 
@@ -106,7 +106,8 @@ void P_TSpectrumExtraction(TString AddName = ""){
     // cout << "Fehler = " << int_error[i] << endl;
     // cout << "Fehler Histo = " << hP_TSpectrum->GetBinError(i+1) << endl;
 
-
+    TLine * fitmin = new TLine (x,ymin,x,ymax);
+    TLine * fitmax = new TLine (x,ymin,x,ymax);
 
     hP_TSpectrum_fit->SetBinContent(i+1,integral_value_fit[i]/(hP_TSpectrum->GetBinWidth(i+1)));
 
