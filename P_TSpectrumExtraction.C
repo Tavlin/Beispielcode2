@@ -27,7 +27,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
   SetLatexSettings(laP_TSpectrum);
 
   // Erstellen der Legende
-  TLegend *leP_TSpectrum = new TLegend(0.4,0.75,0.9,0.95);
+  TLegend *leP_TSpectrum = new TLegend(0.5,0.75,0.9,0.95);
   SetLegendSettigns(leP_TSpectrum);
   leP_TSpectrum->SetTextSize(0.04);
 
@@ -45,13 +45,12 @@ void P_TSpectrumExtraction(TString AddName = ""){
   xbins_pt[28] = 8;
   xbins_pt[29] = 10;
 
-  // Erstelle 1D Histogram fuer Ratio
   TH1D* hP_TSpectrum = new TH1D("hP_TSpectrum","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
-  hP_TSpectrum->SetXTitle("#it{p}_T (GeV/#it{c})");
-
-  // 27 bins, plus ein overflow bin in welches die high pt messungen eingehen
-  // sollen
   SetHistoStandardSettings(hP_TSpectrum);
+
+  TH1D* hP_TSpectrum_fit = new TH1D("hP_TSpectrum_fit","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
+  SetHistoStandardSettings(hP_TSpectrum_fit);
+
   TH1D* hSignal[29];
 
   TH1D* hMinvSpectra[29];
@@ -62,6 +61,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
   Double_t mean[29], sigma[29];
   Double_t integral_value[29];
   Double_t int_error[29];
+  Double_t integral_value_fit[29];
 
   cplayceholder->cd();
   for(int i = 0; i < 29; i++){
@@ -69,7 +69,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
     // definieren und auslesen der Histos
     hMinvSpectra[i] = new TH1D(Form("hMinvSpectra[%d]",i),Form("#it{m}_{inv} spectra [%d]",i),150,0.,0.3);
     SetHistoStandardSettings(hMinvSpectra[i]);
-    //gDirectory->GetObject(Form("hMinvSpectra[%d]",i),hSignal[i+1]);
+
     gDirectory->GetObject(Form("hSignal[%d]",i+1),hMinvSpectra[i]);
 
     // Definieren der Fits und fitten
@@ -90,34 +90,62 @@ void P_TSpectrumExtraction(TString AddName = ""){
     sigma[i] = fGausFit[i]->GetParameter(2);
 
     // 6 Sigma Integration (might lower, since out of bounds sometimes!!!!!)
-    integral_value[i] = hMinvSpectra[i]->IntegralAndError(hMinvSpectra[i]->FindBin(mean[i]-6*sigma[i]),hMinvSpectra[i]->FindBin(mean[i]+6*sigma[i]),int_error[i],"");
+    integral_value[i] =
+    hMinvSpectra[i]->IntegralAndError(hMinvSpectra[i]->FindBin(mean[i]-6*sigma[i]),
+    hMinvSpectra[i]->FindBin(mean[i]+6*sigma[i]),int_error[i],"");
+
+    integral_value_fit[i] = fGausFit_dummy[i]->Integral(mean[i]-6*sigma[i],
+    mean[i]+6*sigma[i])*150./0.3;
 
     // Fill the bins of the p_T spectrum
-    hP_TSpectrum->SetBinContent(i,integral_value[i]);
+    hP_TSpectrum->SetBinContent(i+1,integral_value[i]/(hP_TSpectrum->GetBinWidth(i+1)));
+    hP_TSpectrum->SetBinError(i+1,int_error[i]/(hP_TSpectrum->GetBinWidth(i+1)));
+    // cout << "Bin Content = "  << hP_TSpectrum->GetBinContent(i+1) << endl;
+    // cout << "Integral value = " << integral_value[i] << endl;
+    // cout << "Integral value fit = " << integral_value_fit[i] << endl;
+    // cout << "Fehler = " << int_error[i] << endl;
+    // cout << "Fehler Histo = " << hP_TSpectrum->GetBinError(i+1) << endl;
+
+
+
+    hP_TSpectrum_fit->SetBinContent(i+1,integral_value_fit[i]/(hP_TSpectrum->GetBinWidth(i+1)));
+
     hMinvSpectra[i]->Delete();
   }
+
+  hP_TSpectrum->Scale(1./(500.));
+  hP_TSpectrum_fit->Scale(1./500.);
   // Draw the actual pt spectrum
   cP_TSpectrum->cd();
-  gStyle->SetOptStat(0);
-  cP_TSpectrum->SetLeftMargin(0.125);
+  // gStyle->SetOptStat(0);
+  cP_TSpectrum->SetLeftMargin(0.15);
   cP_TSpectrum->SetTopMargin(0.05);
   cP_TSpectrum->SetBottomMargin(0.15);
   cP_TSpectrum->SetRightMargin(0.05);
   cP_TSpectrum->SetTickx();
   cP_TSpectrum->SetTicky();
-  cP_TSpectrum->SetLogy(0);
+  cP_TSpectrum->SetLogy(1);
   cP_TSpectrum->SetLogx(0);
 
-  leP_TSpectrum->AddEntry(hP_TSpectrum,"#splitline{#pi^{0} #it{p}_{T} spectrum}{without background}");
-  hP_TSpectrum->SetError(int_error);
+  leP_TSpectrum->AddEntry(hP_TSpectrum,"#pi^{0} #it{p}_{T} spectrum");
+  leP_TSpectrum->AddEntry(hP_TSpectrum_fit,"fit function Integral");
+  //hP_TSpectrum->SetError(int_error/(500.*hP_TSpectrum->GetBinWidth(i+1)));
   hP_TSpectrum->SetXTitle("#it{p}_{T} (GeV/#it{c})");
+  hP_TSpectrum->SetYTitle("#frac{d#it{N}}{d#it{p}_{T}} #frac{1}{#it{N}_{evt}} (GeV/#it{c})^{-1}");
   hP_TSpectrum->SetMarkerColor(kViolet+7);
+  hP_TSpectrum_fit->SetMarkerColor(kRed);
   hP_TSpectrum->SetLineColor(kViolet+7);
+  hP_TSpectrum_fit->SetLineColor(kRed);
+  hP_TSpectrum->SetMarkerSize(0.2);
   hP_TSpectrum->Draw("");
+  hP_TSpectrum_fit->Draw("SAME");
   leP_TSpectrum->Draw("SAME");
 
 
   cP_TSpectrum->SaveAs(Form("P_T_Spectra/P_TSpectra.png"));
+
+
+  hP_TSpectrum->Delete();
 
 
 
