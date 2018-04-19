@@ -17,8 +17,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
   TCanvas *cP_TSpectrum = new TCanvas("cP_TSpectrum", "",1080,1080);
 
 
-  TCanvas *cplayceholder = new TCanvas("cplayceholder", "",1080,1080);
-  SetCanvasStandardSettings(cplayceholder);
+  TCanvas *cplaceholder[66];
 
   TGaxis::SetMaxDigits(3);
 
@@ -34,16 +33,17 @@ void P_TSpectrumExtraction(TString AddName = ""){
   // Definieren der Bins fuers pt-Spectrum, vorgegeben durch selektions loop in
   // Extraction.C!
 
-  const Int_t nbins_pt = 29;
+  const Int_t nbins_pt = 66;
   Float_t xbins_pt[nbins_pt+1];
 
-  for (size_t j = 0; j < 26; j++) {
-    xbins_pt[j] = j*0.25;
+  for (size_t j = 0; j < 62; j++) {
+    xbins_pt[j] = j*0.1;
   }
-  xbins_pt[26] = 6.5;
-  xbins_pt[27] = 7;
-  xbins_pt[28] = 8;
-  xbins_pt[29] = 10;
+  xbins_pt[62] = 6.2;
+  xbins_pt[63] = 6.5;
+  xbins_pt[64] = 7;
+  xbins_pt[65] = 7.9;
+  xbins_pt[66] = 10;
 
   TH1D* hP_TSpectrum = new TH1D("hP_TSpectrum","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
   SetHistoStandardSettings(hP_TSpectrum);
@@ -51,24 +51,28 @@ void P_TSpectrumExtraction(TString AddName = ""){
   TH1D* hP_TSpectrum_fit = new TH1D("hP_TSpectrum_fit","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
   SetHistoStandardSettings(hP_TSpectrum_fit);
 
-  TH1D* hSignal[29];
+  TH1D* hSignal[66];
 
-  TH1D* hMinvSpectra[29];
+  TH1D* hMinvSpectra[66];
 
   // Deklarieren der Fit Funktionen
-  TF1* fGausFit[29];
-  TF1* fGausFit_dummy[29];
-  Double_t mean[29], sigma[29];
-  Double_t integral_value[29];
-  Double_t int_error[29];
-  Double_t integral_value_fit[29];
+  TF1* fGausFit[66];
+  TF1* fGausFit_dummy[66];
+  Double_t mean[66], sigma[66];
+  Double_t integral_value[66];
+  Double_t int_error[66];
+  Double_t integral_value_fit[66];
   Double_t ymin, ymax;
-  cplayceholder->cd();
-  for(int i = 0; i < 29; i++){
+  for(int i = 0; i < 66; i++){
 
     // definieren und auslesen der Histos
     hMinvSpectra[i] = new TH1D(Form("hMinvSpectra[%d]",i),Form("#it{m}_{inv} spectra [%d]",i),150,0.,0.3);
     SetHistoStandardSettings(hMinvSpectra[i]);
+
+    cplaceholder[i] = new TCanvas(Form("cplaceholder[%d]",i), "",1080,1080);
+    SetCanvasStandardSettings(cplaceholder[i]);
+
+    cplaceholder[i]->cd();
 
     gDirectory->GetObject(Form("hSignal[%d]",i+1),hMinvSpectra[i]);
 
@@ -82,9 +86,9 @@ void P_TSpectrumExtraction(TString AddName = ""){
     fGausFit_dummy[i]->SetParameter(1,fGausFit[i]->GetParameter(1));
     fGausFit_dummy[i]->SetParameter(2,fGausFit[i]->GetParameter(2));
 
-    hMinvSpectra[i]->Draw();
-    fGausFit_dummy[i]->Draw("same");
-    cplayceholder->SaveAs(Form("P_T_Spectra/P_TSpectra(%d).png",i));
+    // hMinvSpectra[i]->Draw();
+    // fGausFit_dummy[i]->Draw("same");
+    // cplaceholder->SaveAs(Form("P_T_Spectra/P_TSpectra(%d).png",i));
 
     mean[i] = fGausFit[i]->GetParameter(1);
     sigma[i] = fGausFit[i]->GetParameter(2);
@@ -106,10 +110,32 @@ void P_TSpectrumExtraction(TString AddName = ""){
     // cout << "Fehler = " << int_error[i] << endl;
     // cout << "Fehler Histo = " << hP_TSpectrum->GetBinError(i+1) << endl;
 
-    TLine * fitmin = new TLine (x,ymin,x,ymax);
-    TLine * fitmax = new TLine (x,ymin,x,ymax);
+    // Float_t ymax = cplaceholder[i]->GetUymax();
+    // Float_t ymin = cplaceholder[i]->GetUymin();
+    // Float_t xmax = mean[i]+6*sigma[i];
+    // Float_t xmin = mean[i]-6*sigma[i];
 
     hP_TSpectrum_fit->SetBinContent(i+1,integral_value_fit[i]/(hP_TSpectrum->GetBinWidth(i+1)));
+
+    hMinvSpectra[i]->Draw();
+    fGausFit_dummy[i]->Draw("same");
+    cplaceholder[i]->Update();
+    Float_t ymax = cplaceholder[i]->GetUymax();
+    Float_t ymin = cplaceholder[i]->GetUymin();
+    Float_t xmax = mean[i]+6.*sigma[i];
+    Float_t xmin = mean[i]-6.*sigma[i];
+    TLine * fitmin = new TLine(xmin,ymin,xmin,ymax);
+    TLine * fitmax = new TLine(xmax,ymin,xmax,ymax);
+
+    cout << xmin << " " << ymin << " "  << xmax << " " << ymax << endl;
+    fitmin->SetLineColor(kGreen+2);
+    fitmax->SetLineColor(kGreen+2);
+    fitmin->SetLineWidth(2);
+    fitmax->SetLineWidth(2);
+    fitmin->DrawLine(xmin,ymin,xmin,ymax);
+    fitmax->DrawLine(xmax,ymin,xmax,ymax);
+
+    cplaceholder[i]->SaveAs(Form("P_T_Spectra/P_TSpectra(%d).png",i));
 
     hMinvSpectra[i]->Delete();
   }
