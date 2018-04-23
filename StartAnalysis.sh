@@ -13,8 +13,8 @@ mkdir -p P_T_Spectra
 # echo "Starte Reconstruction.C...";
 # root -q -l -b Reconstruction.C\+\(\)
 
-echo "Starte Extraction.C...";
-root -q -l -b Extraction.C\+\(\)
+# echo "Starte Extraction.C...";
+# root -q -l -b Extraction.C\+\(\)
 
 echo "Starte P_TSpectrumExtraction.C...";
 root -q -l -b P_TSpectrumExtraction.C\+\(\)

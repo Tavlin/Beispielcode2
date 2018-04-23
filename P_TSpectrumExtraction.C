@@ -95,11 +95,11 @@ void P_TSpectrumExtraction(TString AddName = ""){
 
     // 6 Sigma Integration (might lower, since out of bounds sometimes!!!!!)
     integral_value[i] =
-    hMinvSpectra[i]->IntegralAndError(hMinvSpectra[i]->FindBin(mean[i]-6*sigma[i]),
-    hMinvSpectra[i]->FindBin(mean[i]+6*sigma[i]),int_error[i],"");
+    hMinvSpectra[i]->IntegralAndError(hMinvSpectra[i]->FindBin(mean[i]-3*sigma[i]),
+    hMinvSpectra[i]->FindBin(mean[i]+3*sigma[i]),int_error[i],"");
 
-    integral_value_fit[i] = fGausFit_dummy[i]->Integral(mean[i]-6*sigma[i],
-    mean[i]+6*sigma[i])*150./0.3;
+    integral_value_fit[i] = fGausFit_dummy[i]->Integral(mean[i]-3*sigma[i],
+    mean[i]+3*sigma[i])*150./0.3;
 
     // Fill the bins of the p_T spectrum
     hP_TSpectrum->SetBinContent(i+1,integral_value[i]/(hP_TSpectrum->GetBinWidth(i+1)));
@@ -122,8 +122,8 @@ void P_TSpectrumExtraction(TString AddName = ""){
     cplaceholder[i]->Update();
     Float_t ymax = cplaceholder[i]->GetUymax();
     Float_t ymin = cplaceholder[i]->GetUymin();
-    Float_t xmax = mean[i]+6.*sigma[i];
-    Float_t xmin = mean[i]-6.*sigma[i];
+    Float_t xmax = mean[i]+3.*sigma[i];
+    Float_t xmin = mean[i]-3.*sigma[i];
     TLine * fitmin = new TLine(xmin,ymin,xmin,ymax);
     TLine * fitmax = new TLine(xmax,ymin,xmax,ymax);
 
@@ -165,6 +165,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
   hP_TSpectrum_fit->SetLineColor(kRed);
   hP_TSpectrum->SetMarkerSize(0.2);
   hP_TSpectrum->Draw("");
+  hP_TSpectrum->GetXaxis()->SetRangeUser(1.25, 10.);
   hP_TSpectrum_fit->Draw("SAME");
   leP_TSpectrum->Draw("SAME");
 

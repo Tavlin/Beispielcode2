@@ -134,7 +134,7 @@ void Extraction(TString AddName = ""){
     hSignal_pT_projection_clone[ip1]->SetYTitle("#frac{d#it{N}}{d#it{m}_{inv}} #left(GeV/c^{2}#right)^{-1}");
     hSignal_pT_projection_clone[ip1]->Draw();
     lSignal_pT_projection_clone->Draw("same");
-    ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf < #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.1*(double)ip3, 0.1*(double)ip1));
+    ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf #leq #it{p}_{T} < %1.2lf GeV/#it{c}" ,0.1*(double)ip3, 0.1*(double)ip1));
 
     cSignal->cd();
     // Zeichnen von minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund
