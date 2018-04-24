@@ -175,7 +175,7 @@ void Extraction(TString AddName = ""){
 
   }
 
-  TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "UPDATE");
+  TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "RECREATE");
   //Lese und speichere in Datei namens HistoFile.root
   //if ( HistoWOBackground_file->IsOpen() ) printf("HistoWOBackground_file opened successfully\n");
 

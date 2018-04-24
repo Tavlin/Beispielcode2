@@ -92,6 +92,7 @@
 ./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/ThreadLocalStorage.h
 ./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/RConfigure.h
 ./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TVirtualTreePlayer.h
+./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TGraph.h
 ./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TRandom.h
 ./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TSystem.h
 ./Reconstruction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TInetAddress.h

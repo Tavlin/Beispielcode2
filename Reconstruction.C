@@ -24,6 +24,9 @@ void Reconstruction(TString AddName = "") {
   TCanvas *cSignalSubtracted = new TCanvas("cSignalSubtracted", "",1080,1080);
   SetCanvasStandardSettings(cSignalSubtracted);
 
+  TCanvas *cBothSignals = new TCanvas("cBothSignals", "",1080,1080);
+  SetCanvasStandardSettings(cBothSignals);
+
 
   // Erstellen der Latex-Objekte
   TLatex *lSignal = new TLatex();
@@ -67,6 +70,7 @@ void Reconstruction(TString AddName = "") {
 
   // read Cluster Tree
   TFile* fDaten = new TFile("pi0_vcal_data.root", "READ");
+  if ( fDaten->IsOpen() ) printf("pi0_vcal_data.root opened successfully\n");
 
 
   const Int_t iPufferMax = 2;
@@ -119,7 +123,7 @@ void Reconstruction(TString AddName = "") {
 
     for (int i1 = 0; i1 < iCluster[iPufferAktuell]; i1++) {
 
-      for(int i3 = 0; (i3 != i1) && (i3 < iCluster[iPufferAktuell]); i3++){
+      for(int i3 = i1+1; (i3 < iCluster[iPufferAktuell]); i3++){
         // Paare im selben Event
         // ....
         px1 = px[iPufferAktuell][i1];
@@ -172,7 +176,7 @@ void Reconstruction(TString AddName = "") {
     }
 
   }
-
+  fDaten->Close();
 
   // Wechsle und Zeichne minv same event
   cSignal->cd();
@@ -209,8 +213,9 @@ void Reconstruction(TString AddName = "") {
 
   // Wechsle und zeichne die Ratio
   cRatio->cd();
+
   // define fit function for ratio
-  TF1* ratio_fit = new TF1("ratio_fit","[0]",0,0.3);
+  TF1* ratio_fit = new TF1("ratio_fit","[0]",0.2,0.3);
   ratio_fit->SetLineColor(kRed);
 
 
@@ -218,7 +223,7 @@ void Reconstruction(TString AddName = "") {
   // wechsle und zeichne Ratio zwischen same und mixed event
   hRatio = (TH1F*)hSignalmix->Clone("hRatio");
   hRatio->Divide(hSignal);
-  hRatio->Fit(ratio_fit,"Q");
+  hRatio->Fit(ratio_fit,"M","",0.2,0.3);
   hRatio->Draw();
   ratio_fit->Draw("l,same");
 
@@ -229,7 +234,7 @@ void Reconstruction(TString AddName = "") {
   // gewichten der mixed events mit der ratio_fit
   TH1F* hSignalmix_clone = (TH1F*)hSignalmix->Clone("hSignalmix_clone");
   TH1F* hSignal_clone = (TH1F*)hSignal->Clone("hSignal_clone");
-  hSignalmix_clone->Divide(ratio_fit);
+  hSignalmix_clone->Scale(1/ratio_fit->GetParameter(0));
 
   hSignal_clone->Add(hSignalmix_clone,-1);
 
@@ -238,7 +243,7 @@ void Reconstruction(TString AddName = "") {
 
 
 
-  TFile* HistoFile = new TFile("HistoFile.root", "UPDATE");
+  TFile* HistoFile = new TFile("HistoFile.root", "RECREATE");
   //Lese und speichere in Datei namens HistoFile.root
   if ( HistoFile->IsOpen() ) printf("HistoFile opened successfully\n");
   //gFile = HistoFile;
@@ -254,6 +259,99 @@ void Reconstruction(TString AddName = "") {
 
   // schliesse datei #sauberes Programmieren
   HistoFile->Close();
+
+  // Error plot fuer minv same events
+  TCanvas *cErrors = new TCanvas("cErrors","",1080,1080);
+  SetCanvasStandardSettings(cErrors);
+  Double_t x_Error[150], y_Error[150];
+  Double_t x_Error_mms[150], y_Error_mms[150];
+  Double_t x_Error_ms_mm[150], y_Error_ms_mm[150];
+  Double_t x_Error_ms_mm_root[150], y_Error_ms_mm_root[150];
+
+  Int_t n = 150;
+  for (Int_t i = 0; i < n; i++) {
+    x_Error[i] = hSignal->GetBinContent(i);
+    y_Error[i] = hSignal->GetBinError(i);
+    x_Error_mms[i] = hSignalmix->GetBinContent(i);
+    y_Error_mms[i] = sqrt((hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))*(hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))+(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0))))*(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0)))));
+    x_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
+    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]));
+    x_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
+    y_Error_ms_mm_root[i] = hSignal_clone->GetBinError(i);
+
+  }
+  TGraph* grErrors = new TGraph(n,x_Error,y_Error);
+  grErrors->SetLineWidth(3);
+  grErrors->SetTitle(";#it{counts};#it{error}");
+
+  TGraph* grError_mms = new TGraph(n,x_Error_mms,y_Error_mms);
+  grError_mms->SetLineWidth(3);
+  grError_mms->SetLineColor(kRed);
+  grError_mms->SetMarkerColor(kRed);
+  grError_mms->SetMarkerStyle(21);
+  grError_mms->SetMarkerSize(1.5);
+  grError_mms->SetTitle(";#it{counts};#it{error}");
+
+  TGraph* grErrors_ms_mm = new TGraph(n,x_Error_ms_mm,y_Error_ms_mm);
+  grErrors_ms_mm->SetLineColor(kGreen+3);
+  grErrors_ms_mm->SetMarkerColor(kGreen+3);
+  grErrors_ms_mm->SetMarkerStyle(20);
+  grErrors_ms_mm->SetMarkerSize(1.5);
+  grErrors_ms_mm->SetTitle(";#it{counts};#it{error}");
+
+  TGraph* grErrors_ms_mm_root = new TGraph(n,x_Error_ms_mm_root,y_Error_ms_mm_root);
+  grErrors_ms_mm_root->SetLineColor(kBlue);
+  grErrors_ms_mm_root->SetMarkerColor(kBlue);
+  grErrors_ms_mm_root->SetMarkerStyle(28);
+  grErrors_ms_mm_root->SetMarkerSize(1.5);
+  grErrors_ms_mm_root->SetTitle(";#it{counts};#it{error}");
+
+  TLegend* legErrors = new TLegend(0.4,0.3,0.8,0.5);
+  SetLegendSettigns(legErrors);
+  legErrors->AddEntry(grErrors_ms_mm, "self calculated errors");
+  legErrors->AddEntry(grErrors_ms_mm_root, "root calculated errors");
+
+
+
+  cErrors->cd();
+  cErrors->SetTopMargin(0.075);
+  cErrors->SetRightMargin(0.1);
+  grErrors->Draw("AC");
+  cErrors->Update();
+
+
+  cErrors->SaveAs(Form("Simulation/ErrorPlot%s.png", AddName.Data()));
+
+  cErrors->Clear();
+  grError_mms->Draw("AC");
+  cErrors->SaveAs(Form("Simulation/MixedScaledErrorPlot%s.png", AddName.Data()));
+
+  cErrors->Clear();
+
+  grErrors_ms_mm_root->Draw("AP");
+  grErrors_ms_mm->Draw("CP");
+  legErrors->Draw("SAMEP");
+  //grErrors_ms_mm_root->Draw("C");
+  cErrors->Update();
+
+  cErrors->SaveAs(Form("Simulation/FurtherErrorPlot%s.png", AddName.Data()));
+
+
+  grErrors->Delete();
+  hSignalmix_pT->Delete();
+  hSignal_pT->Delete();
+  hRatio->Delete();
+  ratio_fit->Delete();
+  hSignalmix_clone->Delete();
+  hSignal_clone->Delete();
+
+
+
+
+
+
+
+
   cout << "finished! :)" << endl;
 
 }

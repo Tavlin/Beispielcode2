@@ -172,7 +172,6 @@ void P_TSpectrumExtraction(TString AddName = ""){
 
   cP_TSpectrum->SaveAs(Form("P_T_Spectra/P_TSpectra.png"));
 
-
   hP_TSpectrum->Delete();
 
 

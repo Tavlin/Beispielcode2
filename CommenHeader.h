@@ -12,6 +12,7 @@
 #include "TH1D.h"
 #include "TH2F.h"
 #include "TTree.h"
+#include "TGraph.h"
 #include "TRandom.h"
 #include <TSystem.h>
 #include <iostream>
