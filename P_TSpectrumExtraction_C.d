@@ -94,6 +94,17 @@
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TVirtualTreePlayer.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TGraph.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TRandom.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TFitResult.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/Fit/FitResult.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/Math/IFunctionfwd.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/Math/IParamFunctionfwd.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixDSym.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixTSym.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixTBase.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixTUtils.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixDSymfwd.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixDUtils.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TMatrixDUtilsfwd.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TSystem.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TInetAddress.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TTimer.h

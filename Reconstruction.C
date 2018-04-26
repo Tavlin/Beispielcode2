@@ -318,10 +318,9 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm_root->SetMarkerSize(1.5);
   grErrors_ms_mm_root->SetTitle(";#it{error};#it{same - mixed events}");
 
-  TLegend* legErrors = new TLegend(0.2,0.6,0.5,0.9);
+  TLegend* legErrors = new TLegend(0.2,0.6,0.5,0.7);
   SetLegendSettigns(legErrors);
-  legErrors->SetFillStyle(0);
-  legErrors->SetFillColor(0);
+  legErrors->SetTextSize(0.04);
   legErrors->AddEntry(grErrors_ms_mm, "self calculated errors");
   legErrors->AddEntry(grErrors_ms_mm_root, "root 5.34 calculated errors");
 
@@ -343,7 +342,9 @@ void Reconstruction(TString AddName = "") {
   cErrors->Clear();
 
   grErrors_ms_mm->Draw("AP");
+  grErrors_ms_mm->GetYaxis()->SetTitleOffset(1.4);
   grErrors_ms_mm_root->Draw("CP");
+  grErrors_ms_mm_root->GetYaxis()->SetTitleOffset(1.4);
   //grErrors_ms_mm->Draw("CP");
   legErrors->Draw("SAMEP");
   cErrors->Update();
@@ -358,6 +359,9 @@ void Reconstruction(TString AddName = "") {
   ratio_fit->Delete();
   hSignalmix_clone->Delete();
   hSignal_clone->Delete();
+  cErrors->Clear();
+  cErrors->Delete();
+
 
 
 

@@ -152,7 +152,7 @@ void Extraction(TString AddName = ""){
 
 
     hSignal[ip1]->Draw("EP");
-    hSignal_mix->Draw("sameL");
+    hSignal_mix->Draw("SAMEl");
 
 
     // Legende fuer minv spektrum der einzelnen pt Bereiche mit skaliertem Hintergrund

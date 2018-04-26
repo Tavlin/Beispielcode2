@@ -14,6 +14,7 @@
 #include "TTree.h"
 #include "TGraph.h"
 #include "TRandom.h"
+#include "TFitResult.h"
 #include <TSystem.h>
 #include <iostream>
 #include <string>

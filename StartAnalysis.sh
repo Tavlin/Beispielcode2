@@ -10,14 +10,14 @@ echo "";
 
 
 # Ordner fuer Bilder machen, Programm ausfuehren, Ordner 1 hoch wegen github
-mkdir -p Simulation
-echo "Starte Reconstruction.C...";
-root -q -l -b Reconstruction.C\+\(\)
-cd ..
-rm -r Simulation/
-mv  Beispielcode2/Simulation/ Simulation/
-cd Beispielcode2
-
+# mkdir -p Simulation
+# echo "Starte Reconstruction.C...";
+# root -q -l -b Reconstruction.C\+\(\)
+# cd ..
+# rm -r Simulation/
+# mv  Beispielcode2/Simulation/ Simulation/
+# cd Beispielcode2
+#
 # mkdir -p Extraction
 # echo "Starte Extraction.C...";
 # root -q -l -b Extraction.C\+\(\)
@@ -25,14 +25,14 @@ cd Beispielcode2
 # rm -r Extraction/
 # mv  Beispielcode2/Extraction/ Extraction/
 # cd Beispielcode2
-#
-# mkdir -p P_T_Spectra
-# echo "Starte P_TSpectrumExtraction.C...";
-# root -q -l -b P_TSpectrumExtraction.C\+\(\)
-# cd ..
-# rm -r P_T_Spectra/
-# mv  Beispielcode2/P_T_Spectra/ P_T_Spectra/
-# cd Beispielcode2
+
+mkdir -p P_T_Spectra
+echo "Starte P_TSpectrumExtraction.C...";
+root -q -l -b P_TSpectrumExtraction.C\+\(\)
+cd ..
+rm -r P_T_Spectra/
+mv  Beispielcode2/P_T_Spectra/ P_T_Spectra/
+cd Beispielcode2
 # Hier wird ein C++ Macro in root aufgerufen
 # Das + bedeutet, dass wir den code kompilieren wollen (.C+),
 #         die \ werden nur verwendet, da einige symbole in bash

@@ -81,7 +81,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
     fGausFit_dummy[i] = new TF1(Form("fGausFit_dummy[%d]",i),"gaus", 0, 0.3);
     fGausFit[i]->SetParLimits(1,0.1,0.15);
     fGausFit[i]->SetParLimits(0,0.,10e6);
-    hMinvSpectra[i]->Fit(Form("fGausFit[%d]",i),"MR0Q","", 0, 0.15);
+    TFitResultPtr r = hMinvSpectra[i]->Fit(Form("fGausFit[%d]",i),"SIMNRE","", 0, 0.15);
     fGausFit_dummy[i]->SetParameter(0,fGausFit[i]->GetParameter(0));
     fGausFit_dummy[i]->SetParameter(1,fGausFit[i]->GetParameter(1));
     fGausFit_dummy[i]->SetParameter(2,fGausFit[i]->GetParameter(2));
@@ -93,7 +93,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
     mean[i] = fGausFit[i]->GetParameter(1);
     sigma[i] = fGausFit[i]->GetParameter(2);
 
-    // 6 Sigma Integration (might lower, since out of bounds sometimes!!!!!)
+    // 3 Sigma Integration (might lower, since out of bounds sometimes!!!!!)
     integral_value[i] =
     hMinvSpectra[i]->IntegralAndError(hMinvSpectra[i]->FindBin(mean[i]-3*sigma[i]),
     hMinvSpectra[i]->FindBin(mean[i]+3*sigma[i]),int_error[i],"");
@@ -115,10 +115,15 @@ void P_TSpectrumExtraction(TString AddName = ""){
     // Float_t xmax = mean[i]+6*sigma[i];
     // Float_t xmin = mean[i]-6*sigma[i];
 
+    const Double_t* GParams, *GMatrixArray;
+    GParams = r->GetParams();
+    GMatrixArray = r->GetCovarianceMatrix().GetMatrixArray();
     hP_TSpectrum_fit->SetBinContent(i+1,integral_value_fit[i]/(hP_TSpectrum->GetBinWidth(i+1)));
+    hP_TSpectrum_fit->SetBinError(i+1,fGausFit_dummy[i]->IntegralError(mean[i]-3*sigma[i],
+    mean[i]+3*sigma[i],GParams, GMatrixArray, 1.e-2)*150./0.3);
 
-    hMinvSpectra[i]->Draw();
-    fGausFit_dummy[i]->Draw("same");
+    hMinvSpectra[i]->Draw("EP");
+    fGausFit_dummy[i]->Draw("SAMEP");
     cplaceholder[i]->Update();
     Float_t ymax = cplaceholder[i]->GetUymax();
     Float_t ymin = cplaceholder[i]->GetUymin();
@@ -136,14 +141,20 @@ void P_TSpectrumExtraction(TString AddName = ""){
     fitmax->DrawLine(xmax,ymin,xmax,ymax);
 
     cplaceholder[i]->SaveAs(Form("P_T_Spectra/P_TSpectra(%d).png",i));
-
+    fitmin->Delete();
+    fitmax->Delete();
     hMinvSpectra[i]->Delete();
+    cplaceholder[i]->Clear();
+    // r->Delete();
   }
 
+  // Normieren auf Anzahl events. normierung auf bin breite bereits beim Fuellen oben!
   hP_TSpectrum->Scale(1./(500.));
   hP_TSpectrum_fit->Scale(1./500.);
+
   // Draw the actual pt spectrum
   cP_TSpectrum->cd();
+
   // gStyle->SetOptStat(0);
   cP_TSpectrum->SetLeftMargin(0.15);
   cP_TSpectrum->SetTopMargin(0.05);
@@ -158,21 +169,27 @@ void P_TSpectrumExtraction(TString AddName = ""){
   leP_TSpectrum->AddEntry(hP_TSpectrum_fit,"fit function Integral");
   //hP_TSpectrum->SetError(int_error/(500.*hP_TSpectrum->GetBinWidth(i+1)));
   hP_TSpectrum->SetXTitle("#it{p}_{T} (GeV/#it{c})");
-  hP_TSpectrum->SetYTitle("#frac{d#it{N}}{d#it{p}_{T}} #frac{1}{#it{N}_{evt}} (GeV/#it{c})^{-1}");
-  hP_TSpectrum->SetMarkerColor(kViolet+7);
+  hP_TSpectrum->SetYTitle("#frac{1}{#it{N}_{evt}} #frac{d#it{N}}{d#it{p}_{T}} (GeV/#it{c})^{-1}");
+  hP_TSpectrum->SetMarkerColor(kBlue+1);
   hP_TSpectrum_fit->SetMarkerColor(kRed);
-  hP_TSpectrum->SetLineColor(kViolet+7);
+  hP_TSpectrum->SetLineColor(kBlue+1);
   hP_TSpectrum_fit->SetLineColor(kRed);
-  hP_TSpectrum->SetMarkerSize(0.2);
+  hP_TSpectrum->SetMarkerSize(1.2);
+  hP_TSpectrum_fit->SetMarkerSize(1.2);
+  hP_TSpectrum_fit->SetMarkerStyle(25);
+  hP_TSpectrum->SetMarkerStyle(21);
+
   hP_TSpectrum->Draw("");
   hP_TSpectrum->GetXaxis()->SetRangeUser(1.25, 10.);
-  hP_TSpectrum_fit->Draw("SAME");
+  hP_TSpectrum_fit->Draw("SAMEP");
   leP_TSpectrum->Draw("SAME");
 
 
   cP_TSpectrum->SaveAs(Form("P_T_Spectra/P_TSpectra.png"));
 
-  hP_TSpectrum->Delete();
+  cP_TSpectrum->Clear();
+  laP_TSpectrum->Delete();
+  leP_TSpectrum->Delete();
 
 
 
