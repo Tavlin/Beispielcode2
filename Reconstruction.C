@@ -270,44 +270,58 @@ void Reconstruction(TString AddName = "") {
 
   Int_t n = 150;
   for (Int_t i = 0; i < n; i++) {
-    x_Error[i] = hSignal->GetBinContent(i);
-    y_Error[i] = hSignal->GetBinError(i);
-    x_Error_mms[i] = hSignalmix->GetBinContent(i);
-    y_Error_mms[i] = sqrt((hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))*(hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))+(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0))))*(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0)))));
-    x_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
-    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]));
-    x_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
-    y_Error_ms_mm_root[i] = hSignal_clone->GetBinError(i);
+    y_Error[i] = hSignal->GetBinContent(i);
+    x_Error[i] = hSignal->GetBinError(i);
+    y_Error_mms[i] = hSignalmix->GetBinContent(i);
+    x_Error_mms[i] = sqrt((hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))*(hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))+(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0))))*(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0)))));
+    y_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
+    x_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(x_Error_mms[i])*(x_Error_mms[i]));
+    y_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
+    x_Error_ms_mm_root[i] = hSignal_clone->GetBinError(i);
 
   }
+  // Error minv same event
   TGraph* grErrors = new TGraph(n,x_Error,y_Error);
+  grErrors->SetFillStyle(0);
+  grErrors->SetFillColor(0);
   grErrors->SetLineWidth(3);
-  grErrors->SetTitle(";#it{counts};#it{error}");
+  grErrors->SetTitle(";#it{error};#it{same events}");
 
+  // Error minv mixed scaled events
   TGraph* grError_mms = new TGraph(n,x_Error_mms,y_Error_mms);
+  grError_mms->SetFillStyle(0);
+  grError_mms->SetFillColor(0);
   grError_mms->SetLineWidth(3);
   grError_mms->SetLineColor(kRed);
   grError_mms->SetMarkerColor(kRed);
   grError_mms->SetMarkerStyle(21);
   grError_mms->SetMarkerSize(1.5);
-  grError_mms->SetTitle(";#it{counts};#it{error}");
+  grError_mms->SetTitle(";#it{error};#it{mixed events scaled}");
 
+  // Error same - scaled mixed
   TGraph* grErrors_ms_mm = new TGraph(n,x_Error_ms_mm,y_Error_ms_mm);
-  grErrors_ms_mm->SetLineColor(kGreen+3);
-  grErrors_ms_mm->SetMarkerColor(kGreen+3);
-  grErrors_ms_mm->SetMarkerStyle(20);
+  grErrors_ms_mm->SetFillStyle(0);
+  grErrors_ms_mm->SetFillColor(0);
+  grErrors_ms_mm->SetLineColor(kRed);
+  grErrors_ms_mm->SetMarkerColor(kRed);
+  grErrors_ms_mm->SetMarkerStyle(21);
   grErrors_ms_mm->SetMarkerSize(1.5);
-  grErrors_ms_mm->SetTitle(";#it{counts};#it{error}");
+  grErrors_ms_mm->SetTitle(";#it{error};#it{same - mixed events}");
 
+  // Error same - scaled mixed by root functions
   TGraph* grErrors_ms_mm_root = new TGraph(n,x_Error_ms_mm_root,y_Error_ms_mm_root);
+  grErrors_ms_mm_root->SetFillStyle(0);
+  grErrors_ms_mm_root->SetFillColor(0);
   grErrors_ms_mm_root->SetLineColor(kBlue);
   grErrors_ms_mm_root->SetMarkerColor(kBlue);
-  grErrors_ms_mm_root->SetMarkerStyle(28);
+  grErrors_ms_mm_root->SetMarkerStyle(25);
   grErrors_ms_mm_root->SetMarkerSize(1.5);
-  grErrors_ms_mm_root->SetTitle(";#it{counts};#it{error}");
+  grErrors_ms_mm_root->SetTitle(";#it{error};#it{same - mixed events}");
 
-  TLegend* legErrors = new TLegend(0.4,0.3,0.8,0.5);
+  TLegend* legErrors = new TLegend(0.2,0.6,0.5,0.9);
   SetLegendSettigns(legErrors);
+  legErrors->SetFillStyle(0);
+  legErrors->SetFillColor(0);
   legErrors->AddEntry(grErrors_ms_mm, "self calculated errors");
   legErrors->AddEntry(grErrors_ms_mm_root, "root calculated errors");
 
@@ -328,10 +342,10 @@ void Reconstruction(TString AddName = "") {
 
   cErrors->Clear();
 
-  grErrors_ms_mm_root->Draw("AP");
-  grErrors_ms_mm->Draw("CP");
+  grErrors_ms_mm->Draw("AP");
+  grErrors_ms_mm_root->Draw("CP");
+  //grErrors_ms_mm->Draw("CP");
   legErrors->Draw("SAMEP");
-  //grErrors_ms_mm_root->Draw("C");
   cErrors->Update();
 
   cErrors->SaveAs(Form("Simulation/FurtherErrorPlot%s.png", AddName.Data()));
