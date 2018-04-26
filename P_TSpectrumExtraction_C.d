@@ -92,6 +92,7 @@
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/ThreadLocalStorage.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/RConfigure.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TVirtualTreePlayer.h
+./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TGraph.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TRandom.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TSystem.h
 ./P_TSpectrumExtraction_C.so: /cvmfs/alice.cern.ch/x86_64-2.6-gnu-4.1.2/Packages/ROOT/v5-34-30-alice7-14/include/TInetAddress.h
