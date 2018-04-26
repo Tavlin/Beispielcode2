@@ -323,7 +323,7 @@ void Reconstruction(TString AddName = "") {
   legErrors->SetFillStyle(0);
   legErrors->SetFillColor(0);
   legErrors->AddEntry(grErrors_ms_mm, "self calculated errors");
-  legErrors->AddEntry(grErrors_ms_mm_root, "root calculated errors");
+  legErrors->AddEntry(grErrors_ms_mm_root, "root 5.34 calculated errors");
 
 
 
