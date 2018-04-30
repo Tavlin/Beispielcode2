@@ -1,7 +1,7 @@
 #include "CommenHeader.h"
 
 void P_TSpectrumExtraction(TString AddName = ""){
-
+  InitStartUp();
   //Open and read file
   TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "READ");
 
@@ -25,6 +25,9 @@ void P_TSpectrumExtraction(TString AddName = ""){
   TLatex *laP_TSpectrum = new TLatex();
   SetLatexSettings(laP_TSpectrum);
 
+  TLatex *ltSignal_pT_projection_clone = new TLatex();
+  SetLatexSettings(ltSignal_pT_projection_clone);
+
   // Erstellen der Legende
   TLegend *leP_TSpectrum = new TLegend(0.5,0.75,0.9,0.95);
   SetLegendSettigns(leP_TSpectrum);
@@ -33,17 +36,9 @@ void P_TSpectrumExtraction(TString AddName = ""){
   // Definieren der Bins fuers pt-Spectrum, vorgegeben durch selektions loop in
   // Extraction.C!
 
-  const Int_t nbins_pt = 66;
-  Float_t xbins_pt[nbins_pt+1];
-
-  for (size_t j = 0; j < 62; j++) {
-    xbins_pt[j] = j*0.1;
-  }
-  xbins_pt[62] = 6.2;
-  xbins_pt[63] = 6.5;
-  xbins_pt[64] = 7;
-  xbins_pt[65] = 7.9;
-  xbins_pt[66] = 10;
+const Int_t kMaxHit;
+  // const Int_t nbins_pt;
+  // Float_t xbins_pt[nbins_pt+1];
 
   TH1D* hP_TSpectrum = new TH1D("hP_TSpectrum","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
   SetHistoStandardSettings(hP_TSpectrum);
@@ -122,8 +117,10 @@ void P_TSpectrumExtraction(TString AddName = ""){
     hP_TSpectrum_fit->SetBinError(i+1,fGausFit_dummy[i]->IntegralError(mean[i]-3*sigma[i],
     mean[i]+3*sigma[i],GParams, GMatrixArray, 1.e-2)*150./0.3);
 
+
     hMinvSpectra[i]->Draw("EP");
     fGausFit_dummy[i]->Draw("SAMEP");
+    ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf #leq #it{p}_{T} < %1.2lf GeV/#it{c}" ,xbins_pt[i], xbins_pt[i+1]));
     cplaceholder[i]->Update();
     Float_t ymax = cplaceholder[i]->GetUymax();
     Float_t ymin = cplaceholder[i]->GetUymin();
@@ -186,6 +183,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
 
 
   cP_TSpectrum->SaveAs(Form("P_T_Spectra/P_TSpectra.png"));
+  hP_TSpectrum->SaveAs(Form("P_TSpectra.root"));
 
   cP_TSpectrum->Clear();
   laP_TSpectrum->Delete();

@@ -1,5 +1,6 @@
 #include "CommenHeader.h"
 
+using namespace std;
 void Reconstruction(TString AddName = "") {
 
 
@@ -181,6 +182,7 @@ void Reconstruction(TString AddName = "") {
   // Wechsle und Zeichne minv same event
   cSignal->cd();
   cSignal->SetTopMargin(0.075);
+  hSignal->Scale(1,"width");
   hSignal->Draw("");
   lSignal->DrawLatex(0.01, 7e3, "#it{m}_{inv} same event");
 
@@ -197,6 +199,7 @@ void Reconstruction(TString AddName = "") {
   // Wechsle und Zeichne minv different event
   cSignalmix->cd();
   cSignalmix->SetTopMargin(0.075);
+  hSignalmix->Scale(1,"width");
   hSignalmix->Draw("");
   lSignalmix->DrawLatex(0.01, 14e3, "#it{m}_{inv} mixed event");
 
@@ -237,7 +240,7 @@ void Reconstruction(TString AddName = "") {
   hSignalmix_clone->Scale(1/ratio_fit->GetParameter(0));
 
   hSignal_clone->Add(hSignalmix_clone,-1);
-
+  // hSignal_clone->Scale(1,"width");
   hSignal_clone->Draw();
 
 
@@ -269,15 +272,25 @@ void Reconstruction(TString AddName = "") {
   Double_t x_Error_ms_mm_root[150], y_Error_ms_mm_root[150];
 
   Int_t n = 150;
+  Double_t fse[150], sse[150]; //first_scaling_error and second_scaling_error
   for (Int_t i = 0; i < n; i++) {
-    y_Error[i] = hSignal->GetBinContent(i);
-    x_Error[i] = hSignal->GetBinError(i);
-    y_Error_mms[i] = hSignalmix->GetBinContent(i);
-    x_Error_mms[i] = sqrt((hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))*(hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0))+(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0))))*(hSignalmix->GetBinContent(i)*4.18e-3/((ratio_fit->GetParameter(0))*(ratio_fit->GetParameter(0)))));
-    y_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
-    x_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(x_Error_mms[i])*(x_Error_mms[i]));
-    y_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
-    x_Error_ms_mm_root[i] = hSignal_clone->GetBinError(i);
+    // same event
+    x_Error[i] = hSignal->GetBinContent(i);
+    y_Error[i] = hSignal->GetBinError(i);
+
+    // mixed
+    x_Error_mms[i] = hSignalmix->GetBinContent(i);
+    fse[i] = hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0);
+    sse[i] = (hSignalmix->GetBinContent(i)*ratio_fit->GetParError(0)/(ratio_fit->GetParameter(0)*ratio_fit->GetParameter(0)));
+    y_Error_mms[i] = sqrt((fse[i]*fse[i])+(sse[i]*sse[i]));
+
+    // same - scaled mixed event haendisch
+    x_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
+    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]));
+
+    // same - mixed event root
+    x_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
+    y_Error_ms_mm_root[i] = hSignal_clone->GetBinError(i);
 
   }
   // Error minv same event
@@ -285,7 +298,11 @@ void Reconstruction(TString AddName = "") {
   grErrors->SetFillStyle(0);
   grErrors->SetFillColor(0);
   grErrors->SetLineWidth(3);
-  grErrors->SetTitle(";#it{error};#it{same events}");
+  grErrors->SetMarkerColor(kRed);
+  grErrors->SetMarkerStyle(20);
+  grErrors->SetMarkerSize(1.5);
+
+  grErrors->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma} (GeV/#it{c}^{2})^{-1}");
 
   // Error minv mixed scaled events
   TGraph* grError_mms = new TGraph(n,x_Error_mms,y_Error_mms);
@@ -294,9 +311,9 @@ void Reconstruction(TString AddName = "") {
   grError_mms->SetLineWidth(3);
   grError_mms->SetLineColor(kRed);
   grError_mms->SetMarkerColor(kRed);
-  grError_mms->SetMarkerStyle(21);
+  grError_mms->SetMarkerStyle(20);
   grError_mms->SetMarkerSize(1.5);
-  grError_mms->SetTitle(";#it{error};#it{mixed events scaled}");
+  grError_mms->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma} (GeV/#it{c}^{2})^{-1}");
 
   // Error same - scaled mixed
   TGraph* grErrors_ms_mm = new TGraph(n,x_Error_ms_mm,y_Error_ms_mm);
@@ -306,7 +323,7 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm->SetMarkerColor(kRed);
   grErrors_ms_mm->SetMarkerStyle(21);
   grErrors_ms_mm->SetMarkerSize(1.5);
-  grErrors_ms_mm->SetTitle(";#it{error};#it{same - mixed events}");
+  grErrors_ms_mm->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma} (GeV/#it{c}^{2})^{-1}");
 
   // Error same - scaled mixed by root functions
   TGraph* grErrors_ms_mm_root = new TGraph(n,x_Error_ms_mm_root,y_Error_ms_mm_root);
@@ -316,12 +333,12 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm_root->SetMarkerColor(kBlue);
   grErrors_ms_mm_root->SetMarkerStyle(25);
   grErrors_ms_mm_root->SetMarkerSize(1.5);
-  grErrors_ms_mm_root->SetTitle(";#it{error};#it{same - mixed events}");
+  grErrors_ms_mm_root->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}; #it{#sigma}");
 
   TLegend* legErrors = new TLegend(0.2,0.6,0.5,0.7);
   SetLegendSettigns(legErrors);
   legErrors->SetTextSize(0.04);
-  legErrors->AddEntry(grErrors_ms_mm, "self calculated errors");
+  legErrors->AddEntry(grErrors_ms_mm, "self-calculated errors");
   legErrors->AddEntry(grErrors_ms_mm_root, "root 5.34 calculated errors");
 
 
@@ -329,21 +346,22 @@ void Reconstruction(TString AddName = "") {
   cErrors->cd();
   cErrors->SetTopMargin(0.075);
   cErrors->SetRightMargin(0.1);
-  grErrors->Draw("AC");
+  grErrors->Draw("AP");
   cErrors->Update();
 
 
   cErrors->SaveAs(Form("Simulation/ErrorPlot%s.png", AddName.Data()));
 
   cErrors->Clear();
-  grError_mms->Draw("AC");
+  grError_mms->Draw("AP");
   cErrors->SaveAs(Form("Simulation/MixedScaledErrorPlot%s.png", AddName.Data()));
 
   cErrors->Clear();
 
-  grErrors_ms_mm->Draw("AP");
+  grErrors_ms_mm_root->Draw("AP");
+  grErrors_ms_mm->Draw("P");
   grErrors_ms_mm->GetYaxis()->SetTitleOffset(1.4);
-  grErrors_ms_mm_root->Draw("CP");
+  // grErrors_ms_mm_root->Draw("P");
   grErrors_ms_mm_root->GetYaxis()->SetTitleOffset(1.4);
   //grErrors_ms_mm->Draw("CP");
   legErrors->Draw("SAMEP");

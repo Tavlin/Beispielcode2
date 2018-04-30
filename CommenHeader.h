@@ -19,8 +19,22 @@
 #include <iostream>
 #include <string>
 
+
 const Int_t kMaxHit = 2000;
 
+Double_t* GetBinningFromHistogram(TH1D* hist)
+{
+  if(!hist) return 0;
+  TArrayD* dArray = (TArrayD*)hist->GetXaxis()->GetXbins();
+  return dArray->GetArray();
+}
+
+Int_t GetNBinningFromHistogram(TH1D* hist)
+{
+  if(!hist) return 0;
+  TArrayD* dArray = (TArrayD*)hist->GetXaxis()->GetXbins();
+  return dArray->GetSize();
+}
 
 Float_t fCalcInvMass(Float_t px1, Float_t py1, Float_t pz1, Float_t px2, Float_t py2, Float_t pz2){
   return sqrt(2.*(sqrt(px1*px1+py1*py1+pz1*pz1)*sqrt(px2*px2+py2*py2+pz2*pz2)-(px1*px2+py1*py2+pz1*pz2)));
@@ -30,6 +44,31 @@ Float_t fCalcPT(Float_t px1, Float_t py1, Float_t px2, Float_t py2){
   return sqrt((px1+px2)*(px1+px2)+(py1+py2)*(py1+py2));
 }
 
+Float_t fCalcInvMass(Float_t px1, Float_t py1, Float_t pz1, Float_t px2, Float_t py2, Float_t pz2, Float_t e_gamma_1, Float_t e_gamma_2){
+
+
+  return sqrt(2.*e_gamma_1*e_gamma_2*(1.-(px1*px2+py1*py2+pz1*pz2)/(sqrt(px1*px1+py1*py1+pz1*pz1)*sqrt(px2*px2+py2*py2+pz2*pz2))));
+}
+
+Float_t fEnergySmear(Float_t energy){
+
+  return gRandom->Gaus(energy,0.03/sqrt(energy));
+}
+
+
+Float_t fCalcPT(Float_t e_lab, Float_t m, Float_t y_lab){
+    return sqrt((e_lab*e_lab)/cosh(y_lab)-m*m);
+}
+
+Bool_t fCheckAcc(Float_t phi1, Float_t phi2, Float_t eta1, Float_t eta2, Float_t phi_detec){
+    if (fabs(phi1)<= phi_detec  && fabs(phi2)<=phi_detec){
+      if (fabs(eta1) < 0.5 && fabs(eta2) < 0.5){
+
+        return true;
+      }
+    }
+    return false;
+}
 
 void RotateToLabSystem(const float& theta, const float& phi,
 		       const float& p1, const float& p2, const float& p3,
@@ -125,7 +164,7 @@ void SetHistoStandardSettings(TH1* histo, Double_t XOffset = 1.2, Double_t YOffs
   histo->SetTitle("");
   histo->SetXTitle("#it{m}_{inv} (GeV/#it{c}^{2})");
   histo->GetXaxis()->SetTitleOffset(1.4);
-  histo->SetYTitle("#it{counts}");
+  histo->SetYTitle("#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}");
   histo->GetYaxis()->SetTitleOffset(1.4);
   histo->Sumw2();
 
@@ -196,7 +235,18 @@ void SetLatexSettings(TLatex* tex){
 
 
 
-
+void printProgress (Double_t progress)
+{
+  int barWidth = 50;
+  std::cout.flush();
+  std::cout << "["<< int(progress * 100.0) << "%]" << "[";
+  int pos = barWidth * progress;
+  for (int i = 0; i < barWidth; ++i) {
+      if (i < pos) std::cout << "|";
+      else std::cout << " ";
+  }
+  std::cout << "]\r";
+}
 
 
 

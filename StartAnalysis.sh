@@ -18,13 +18,13 @@ echo "";
 # mv  Beispielcode2/Simulation/ Simulation/
 # cd Beispielcode2
 #
-# mkdir -p Extraction
-# echo "Starte Extraction.C...";
-# root -q -l -b Extraction.C\+\(\)
-# cd ..
-# rm -r Extraction/
-# mv  Beispielcode2/Extraction/ Extraction/
-# cd Beispielcode2
+mkdir -p Extraction
+echo "Starte Extraction.C...";
+root -q -l -b Extraction.C\+\(\)
+cd ..
+rm -r Extraction/
+mv  Beispielcode2/Extraction/ Extraction/
+cd Beispielcode2
 
 mkdir -p P_T_Spectra
 echo "Starte P_TSpectrumExtraction.C...";
