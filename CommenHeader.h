@@ -17,7 +17,10 @@
 #include "TFitResult.h"
 #include <TSystem.h>
 #include <iostream>
+#include <fstream>
+#include <stdlib.h>
 #include <string>
+#include <vector>
 
 
 const Int_t kMaxHit = 2000;

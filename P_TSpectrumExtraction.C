@@ -1,7 +1,40 @@
 #include "CommenHeader.h"
 
 void P_TSpectrumExtraction(TString AddName = ""){
-  InitStartUp();
+
+  //Create a dynamic array to hold the values
+	vector<Double_t> lower_bins;
+
+	//Create an input file stream
+	std::ifstream in("binlowbounds.txt",ios::in);
+
+	/*
+            As long as we haven't reached the end of the file, keep reading entries.
+	*/
+
+	Double_t number;  //Variable to hold each number as it is read
+
+        //Read number using the extraction (>>) operator
+        while (in >> number) {
+		//Add the number to the end of the array
+		lower_bins.push_back(number);
+	}
+
+	//Close the file stream
+	in.close();
+
+  Int_t bin_lenght = lower_bins.size();
+  Double_t bin_array[bin_lenght];
+
+  // std::cout << "bin_lenght = " << bin_lenght << std::endl;
+
+  for (Int_t q = 0; q < bin_lenght; q++) {
+    bin_array[q] = lower_bins[q];
+    std::cout << "bin_array[" << q << "] = " << bin_array[q] << std::endl;
+  }
+
+
+
   //Open and read file
   TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "READ");
 
@@ -15,9 +48,7 @@ void P_TSpectrumExtraction(TString AddName = ""){
 
   // Erstellen der Canvas
   TCanvas *cP_TSpectrum = new TCanvas("cP_TSpectrum", "",1080,1080);
-
-
-  TCanvas *cplaceholder[66];
+  TCanvas *cplaceholder[bin_lenght-1];
 
   TGaxis::SetMaxDigits(3);
 
@@ -36,29 +67,29 @@ void P_TSpectrumExtraction(TString AddName = ""){
   // Definieren der Bins fuers pt-Spectrum, vorgegeben durch selektions loop in
   // Extraction.C!
 
-const Int_t kMaxHit;
-  // const Int_t nbins_pt;
+  // Int_t kMaxHit;
+  // Int_t nbins_pt;
   // Float_t xbins_pt[nbins_pt+1];
 
-  TH1D* hP_TSpectrum = new TH1D("hP_TSpectrum","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
+  TH1D* hP_TSpectrum = new TH1D("hP_TSpectrum","#it{p}_{T} spectrum",bin_lenght-1, bin_array);
   SetHistoStandardSettings(hP_TSpectrum);
 
-  TH1D* hP_TSpectrum_fit = new TH1D("hP_TSpectrum_fit","#it{p}_{T} spectrum",nbins_pt,xbins_pt);
+  TH1D* hP_TSpectrum_fit = new TH1D("hP_TSpectrum_fit","#it{p}_{T} spectrum",bin_lenght-1, bin_array);
   SetHistoStandardSettings(hP_TSpectrum_fit);
 
-  TH1D* hSignal[66];
+  TH1D* hSignal[bin_lenght-1];
 
-  TH1D* hMinvSpectra[66];
+  TH1D* hMinvSpectra[bin_lenght-1];
 
   // Deklarieren der Fit Funktionen
-  TF1* fGausFit[66];
-  TF1* fGausFit_dummy[66];
-  Double_t mean[66], sigma[66];
-  Double_t integral_value[66];
-  Double_t int_error[66];
-  Double_t integral_value_fit[66];
+  TF1* fGausFit[bin_lenght-1];
+  TF1* fGausFit_dummy[bin_lenght-1];
+  Double_t mean[bin_lenght-1], sigma[bin_lenght-1];
+  Double_t integral_value[bin_lenght-1];
+  Double_t int_error[bin_lenght-1];
+  Double_t integral_value_fit[bin_lenght-1];
   Double_t ymin, ymax;
-  for(int i = 0; i < 66; i++){
+  for(int i = 0; i < bin_lenght-1; i++){
 
     // definieren und auslesen der Histos
     hMinvSpectra[i] = new TH1D(Form("hMinvSpectra[%d]",i),Form("#it{m}_{inv} spectra [%d]",i),150,0.,0.3);
@@ -76,7 +107,7 @@ const Int_t kMaxHit;
     fGausFit_dummy[i] = new TF1(Form("fGausFit_dummy[%d]",i),"gaus", 0, 0.3);
     fGausFit[i]->SetParLimits(1,0.1,0.15);
     fGausFit[i]->SetParLimits(0,0.,10e6);
-    TFitResultPtr r = hMinvSpectra[i]->Fit(Form("fGausFit[%d]",i),"SIMNRE","", 0, 0.15);
+    TFitResultPtr r = hMinvSpectra[i]->Fit(Form("fGausFit[%d]",i),"SIMNREQ","", 0, 0.15);
     fGausFit_dummy[i]->SetParameter(0,fGausFit[i]->GetParameter(0));
     fGausFit_dummy[i]->SetParameter(1,fGausFit[i]->GetParameter(1));
     fGausFit_dummy[i]->SetParameter(2,fGausFit[i]->GetParameter(2));
@@ -120,7 +151,7 @@ const Int_t kMaxHit;
 
     hMinvSpectra[i]->Draw("EP");
     fGausFit_dummy[i]->Draw("SAMEP");
-    ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf #leq #it{p}_{T} < %1.2lf GeV/#it{c}" ,xbins_pt[i], xbins_pt[i+1]));
+    ltSignal_pT_projection_clone->DrawLatexNDC(0.6,0.8,Form("%1.2lf #leq #it{p}_{T} < %1.2lf GeV/#it{c}" , bin_array[i], bin_array[i+1]));
     cplaceholder[i]->Update();
     Float_t ymax = cplaceholder[i]->GetUymax();
     Float_t ymin = cplaceholder[i]->GetUymin();
@@ -177,7 +208,7 @@ const Int_t kMaxHit;
   hP_TSpectrum->SetMarkerStyle(21);
 
   hP_TSpectrum->Draw("");
-  hP_TSpectrum->GetXaxis()->SetRangeUser(1.25, 10.);
+  hP_TSpectrum->GetXaxis()->SetRangeUser(1.3, 10.);
   hP_TSpectrum_fit->Draw("SAMEP");
   leP_TSpectrum->Draw("SAME");
 

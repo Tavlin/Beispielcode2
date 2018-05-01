@@ -55,6 +55,8 @@ void Extraction(TString AddName = ""){
   gDirectory->GetObject("hSignal_pT",hSignal_pT);
   gDirectory->GetObject("hSignalmix_pT",hSignalmix_pT);
 
+  // creating vector to get binning at this point
+  std::vector<Double_t> binning_vec;
 
   for(int ip1 = 100; ip1 > 0; ip1--){
 
@@ -105,7 +107,7 @@ void Extraction(TString AddName = ""){
       hRatio->SetBinError(num_bin,0);
     }
 
-    hRatio->Fit(ratio_fit);
+    hRatio->Fit(ratio_fit, "QM");
     hRatio->Draw();
     ratio_fit->Draw("L,SAME");
 
@@ -171,9 +173,52 @@ void Extraction(TString AddName = ""){
     cRatio->SaveAs(Form("Extraction/Ratio(%1.2lf-%1.2lf).png", 0.1*(double)ip3, 0.1*(double)ip1));
     cSignalSubtracted->SaveAs(Form("Extraction/InavrianteMasseOhneHintergrund_pt(%1.2lf-%1.2lf).png", 0.1*(double)ip3, 0.1*(double)ip1));
     cSignal->SaveAs(Form("Extraction/InavrianteMasseMitHintergrund(%1.2lf-%1.2lf).png", 0.1*(double)ip3, 0.1*(double)ip1));
+
+    // filling binning_vec to get binning at this point
+    // Carefull, right now biining is reversed!
+    binning_vec.push_back(0.1*(Double_t)ip3);
+
+
+
+
+
     ip1 = ip3+1;
 
+
   }
+
+  /*
+  Absolut beschiessener Weg den FUCKING binarray zu bekommen, aber geht hier
+  glaube noch nicht anders, da das binning selbst erst in P_TSpectrumExtraction.C
+  kommt und somit die Funktionen GetBinningFromHistogram & GetNBinningFromHistogram
+  von Patrick noch nicht benutzbar sind.
+  */
+
+  // bin länge und array fürs bin definieren und initalisieren:
+  Int_t bin_lenght = binning_vec.size();
+  Double_t bin_array[bin_lenght+1];
+
+  for (Int_t q = 0; q < bin_lenght; q++) {
+    bin_array[q] = binning_vec[bin_lenght-q-1];
+    // std::cout << "bin_array[" << q << "] = " << bin_array[q] << std::endl;
+  }
+  bin_array[bin_lenght] = 10.;
+
+  std::ofstream my_binlowbound_file;
+
+  // writing binning in an external file.
+  my_binlowbound_file.open("binlowbounds.txt");
+
+  int a = 0;
+  do{
+      my_binlowbound_file << bin_array[a] << endl;
+      a++;
+
+  }while(a <= bin_lenght);
+
+
+  my_binlowbound_file.close();
+
 
   TFile* HistoWOBackground_file = new TFile("HistoWOBackground_file.root", "RECREATE");
   //Lese und speichere in Datei namens HistoFile.root
@@ -189,7 +234,8 @@ void Extraction(TString AddName = ""){
 
   // schliesse datei #sauberes Programmieren
   HistoWOBackground_file->Close();
-  cout << "finished! :)" << endl;
+  cout << "Extraction finished! :)" << endl;
+
 
 
 

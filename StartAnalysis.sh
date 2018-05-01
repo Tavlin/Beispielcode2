@@ -10,23 +10,26 @@ echo "";
 
 
 # Ordner fuer Bilder machen, Programm ausfuehren, Ordner 1 hoch wegen github
-# mkdir -p Simulation
+# mkdir -p Reconstructed
+# rm Reconstruction_*
 # echo "Starte Reconstruction.C...";
 # root -q -l -b Reconstruction.C\+\(\)
 # cd ..
-# rm -r Simulation/
-# mv  Beispielcode2/Simulation/ Simulation/
+# rm -r Reconstructed/
+# mv  Beispielcode2/Reconstructed/ Reconstructed/
 # cd Beispielcode2
 #
-mkdir -p Extraction
-echo "Starte Extraction.C...";
-root -q -l -b Extraction.C\+\(\)
-cd ..
-rm -r Extraction/
-mv  Beispielcode2/Extraction/ Extraction/
-cd Beispielcode2
+# mkdir -p Extraction
+# rm Extraction_*
+# echo "Starte Extraction.C...";
+# root -q -l -b Extraction.C\+\(\)
+# cd ..
+# rm -r Extraction/
+# mv  Beispielcode2/Extraction/ Extraction/
+# cd Beispielcode2
 
 mkdir -p P_T_Spectra
+rm P_TSpectrumExtraction_*
 echo "Starte P_TSpectrumExtraction.C...";
 root -q -l -b P_TSpectrumExtraction.C\+\(\)
 cd ..
