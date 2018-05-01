@@ -3,7 +3,9 @@
 using namespace std;
 void Reconstruction(TString AddName = "") {
 
-
+  Float_t pi = TMath::Pi();
+  std::vector<Double_t> eta_vec;
+  std::vector<Double_t> phi_vec;
 
 
   // Erstellen der Canvas
@@ -27,6 +29,9 @@ void Reconstruction(TString AddName = "") {
 
   TCanvas *cBothSignals = new TCanvas("cBothSignals", "",1080,1080);
   SetCanvasStandardSettings(cBothSignals);
+
+  TCanvas *cWinkelAbdeckung = new TCanvas("cWinkelAbdeckung", "",1080,1080);
+  SetCanvasStandardSettings(cWinkelAbdeckung);
 
 
   // Erstellen der Latex-Objekte
@@ -66,6 +71,11 @@ void Reconstruction(TString AddName = "") {
 
   TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",150,0.,0.3,100,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
+
+  TH2F* hWinkelAbdeckung = new TH2F("hWinkelAbdeckung","Winkelabdeckung same events",100,-1.,1.,180,-1.*pi,1.*pi);
+  SetHistoStandardSettings2(hWinkelAbdeckung);
+  hWinkelAbdeckung->SetXTitle("#it{#eta}");
+  hWinkelAbdeckung->SetYTitle("#it{#phi}");
 
   TGaxis::SetMaxDigits(3);
 
@@ -122,6 +132,8 @@ void Reconstruction(TString AddName = "") {
     Float_t py2;
     Float_t pz2;
 
+    Double_t eta, phi;
+
     for (int i1 = 0; i1 < iCluster[iPufferAktuell]; i1++) {
 
       for(int i3 = i1+1; (i3 < iCluster[iPufferAktuell]); i3++){
@@ -133,6 +145,16 @@ void Reconstruction(TString AddName = "") {
     	  px2 = px[iPufferAktuell][i3];
     	  py2 = py[iPufferAktuell][i3];
     	  pz2 = pz[iPufferAktuell][i3];
+
+        // Need to be discussed, phi angeblich 360°!?!
+        eta = atanh(pz1/sqrt(px1*px1+py1*py1+pz1*pz1));
+        eta_vec.push_back(eta);
+
+        phi = atan2(py1,px1);
+        phi_vec.push_back(phi);
+
+        hWinkelAbdeckung->Fill(eta,phi);
+
 
         pair_pt = fCalcPT(px1,py1,px2,py2); //pair_pt_same?
         if (pair_pt > 0) {
@@ -379,6 +401,28 @@ void Reconstruction(TString AddName = "") {
   hSignal_clone->Delete();
   cErrors->Clear();
   cErrors->Delete();
+
+  cWinkelAbdeckung->cd();
+  cWinkelAbdeckung->SetRightMargin(0.175);
+  cWinkelAbdeckung->SetBottomMargin(0.125);
+  gPad->SetLogz();
+
+  hWinkelAbdeckung->GetZaxis()->SetRangeUser(1.e0,1.e4);
+  hWinkelAbdeckung->Draw("colz");
+  lSignalmix_pT->DrawLatexNDC(0.35, 0.45, "Winkelabdeckung same event");
+  cWinkelAbdeckung->Update();
+
+  cWinkelAbdeckung->SaveAs(Form("Reconstructed/Winkelabdeckung%s.png", AddName.Data()));
+
+  cWinkelAbdeckung->Clear();
+  hWinkelAbdeckung->Delete();
+  cWinkelAbdeckung->Delete();
+
+
+  std::cout << "eta min = " << *min_element(eta_vec.begin(), eta_vec.end())  << std::endl;
+  std::cout << "eta max = " << *max_element(eta_vec.begin(), eta_vec.end())  << std::endl;
+  std::cout << "phi min = " << *min_element(phi_vec.begin(), phi_vec.end())  << std::endl;
+  std::cout << "phi max = " << *max_element(phi_vec.begin(), phi_vec.end())  << std::endl;
 
 
 
