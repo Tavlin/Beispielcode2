@@ -76,6 +76,14 @@ void Reconstruction(TString AddName = "") {
   SetHistoStandardSettings2(hWinkelAbdeckung);
   hWinkelAbdeckung->SetXTitle("#it{#eta}");
   hWinkelAbdeckung->SetYTitle("#it{#phi}");
+  hWinkelAbdeckung->GetYaxis()->SetBit(TAxis::kLabelsVert);
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(1,"0");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(pi.), "#pi");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(pi/2.),"#frac{-#pi}{2}");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(0),"0");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(-pi.), "#pi");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(-pi/2.),"#frac{-#pi}{2}");
+  hWinkelAbdeckung->GetXaxis()->SetNdivisions(6);
 
   TGaxis::SetMaxDigits(3);
 
@@ -204,7 +212,7 @@ void Reconstruction(TString AddName = "") {
   // Wechsle und Zeichne minv same event
   cSignal->cd();
   cSignal->SetTopMargin(0.075);
-  hSignal->Scale(1,"width");
+  // hSignal->Scale(1,"width");
   hSignal->Draw("");
   lSignal->DrawLatex(0.01, 7e3, "#it{m}_{inv} same event");
 
@@ -221,7 +229,7 @@ void Reconstruction(TString AddName = "") {
   // Wechsle und Zeichne minv different event
   cSignalmix->cd();
   cSignalmix->SetTopMargin(0.075);
-  hSignalmix->Scale(1,"width");
+  // hSignalmix->Scale(1,"width");
   hSignalmix->Draw("");
   lSignalmix->DrawLatex(0.01, 14e3, "#it{m}_{inv} mixed event");
 
@@ -262,7 +270,9 @@ void Reconstruction(TString AddName = "") {
   hSignalmix_clone->Scale(1/ratio_fit->GetParameter(0));
 
   hSignal_clone->Add(hSignalmix_clone,-1);
-  // hSignal_clone->Scale(1,"width");
+
+
+  hSignal_clone->Scale(1,"width");
   hSignal_clone->Draw();
 
 
@@ -308,7 +318,7 @@ void Reconstruction(TString AddName = "") {
 
     // same - scaled mixed event haendisch
     x_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
-    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]));
+    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]))*500;
 
     // same - mixed event root
     x_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
@@ -355,13 +365,13 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm_root->SetMarkerColor(kBlue);
   grErrors_ms_mm_root->SetMarkerStyle(25);
   grErrors_ms_mm_root->SetMarkerSize(1.5);
-  grErrors_ms_mm_root->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}; #it{#sigma}");
+  grErrors_ms_mm_root->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}; #it{#sigma} (GeV/#it{c}^{2})^{-1}");
 
-  TLegend* legErrors = new TLegend(0.2,0.6,0.5,0.7);
+  TLegend* legErrors = new TLegend(0.3,0.5,0.6,0.6);
   SetLegendSettigns(legErrors);
   legErrors->SetTextSize(0.04);
-  legErrors->AddEntry(grErrors_ms_mm, "self-calculated errors");
-  legErrors->AddEntry(grErrors_ms_mm_root, "root 5.34 calculated errors");
+  legErrors->AddEntry(grErrors_ms_mm, "self-calculated uncertainty");
+  legErrors->AddEntry(grErrors_ms_mm_root, "root 5.34 calculated uncertainty");
 
 
 
@@ -380,12 +390,12 @@ void Reconstruction(TString AddName = "") {
 
   cErrors->Clear();
 
-  grErrors_ms_mm_root->Draw("AP");
-  grErrors_ms_mm->Draw("P");
+  grErrors_ms_mm->Draw("AP");
+  grErrors_ms_mm_root->Draw("P");
   grErrors_ms_mm->GetYaxis()->SetTitleOffset(1.4);
-  // grErrors_ms_mm_root->Draw("P");
   grErrors_ms_mm_root->GetYaxis()->SetTitleOffset(1.4);
-  //grErrors_ms_mm->Draw("CP");
+  grErrors_ms_mm->GetXaxis()->SetTitleOffset(1.6);
+  grErrors_ms_mm_root->GetXaxis()->SetTitleOffset(1.6);
   legErrors->Draw("SAMEP");
   cErrors->Update();
 

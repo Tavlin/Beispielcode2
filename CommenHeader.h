@@ -252,7 +252,10 @@ void printProgress (Double_t progress)
 }
 
 
-
+TString sigma_minv_str = TString("#it{#sigma} (GeV/#it{c}^{2})^{-1}");
+TString minv_str = TString("#it{m}_{inv} (GeV/#it{c}^{2})");
+TString pt_str = TString("#it{p}_{T} (GeV/#it{c})");
+TString dNdmin_str = TString("#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}");
 
 
 
