@@ -385,13 +385,13 @@ void Reconstruction(TString AddName = "") {
   legErrorsSame->AddEntry(sqrtNsame, "#sqrt{N} fit");
 
 
-  TF1* sqrtNmixed = new TF1("sqrtNmixed", "sqrt((sqrt(x)/[0])^2+((x*[1])/[2])^2)",0.,16.e3);
-  sqrtNmixed->SetLineColor(kBlue+1);
-  sqrtNmixed->SetLineWidth(3);
-  TLegend* legErrorsMixed = new TLegend(0.25,0.75,0.6,0.85);
-  SetLegendSettigns(legErrorsMixed);
-  legErrorsMixed->AddEntry(grError_mms, "self-calculated uncertainty");
-  legErrorsMixed->AddEntry(sqrtNmixed, "#sqrt{N} fit");
+  // TF1* sqrtNmixed = new TF1("sqrtNmixed", "sqrt((sqrt(x)/[0])^2+((x*[1])/[2])^2)",0.,16.e3);
+  // sqrtNmixed->SetLineColor(kBlue+1);
+  // sqrtNmixed->SetLineWidth(3);
+  // TLegend* legErrorsMixed = new TLegend(0.25,0.75,0.6,0.85);
+  // SetLegendSettigns(legErrorsMixed);
+  // legErrorsMixed->AddEntry(grError_mms, "self-calculated uncertainty");
+  // legErrorsMixed->AddEntry(sqrtNmixed, "#sqrt{N} fit");
 
 
   cErrors->cd();
@@ -418,9 +418,9 @@ void Reconstruction(TString AddName = "") {
   grError_mms->Draw("AP");
   grError_mms->GetYaxis()->SetTitleOffset(1.4);
   grError_mms->GetXaxis()->SetTitleOffset(1.6);
-  grError_mms->Fit(sqrtNmixed,"M");
-  sqrtNmixed->Draw("same");
-  legErrorsMixed->Draw("same");
+  // grError_mms->Fit(sqrtNmixed,"M");
+  // sqrtNmixed->Draw("same");
+  // legErrorsMixed->Draw("same");
   poweektex->SetTextSize(0.04);
   poweektex->DrawLatexNDC(0.45,0.5,poweek_str);
   poweektex->DrawLatexNDC(0.45,0.45,pi0togamma_str);
