@@ -1,4 +1,5 @@
 #include "TLatex.h"
+#include "stddef.h"
 #include "TLegend.h"
 #include "TObject.h"
 #include "TCanvas.h"
@@ -256,6 +257,8 @@ TString sigma_minv_str = TString("#it{#sigma} (GeV/#it{c}^{2})^{-1}");
 TString minv_str = TString("#it{m}_{inv} (GeV/#it{c}^{2})");
 TString pt_str = TString("#it{p}_{T} (GeV/#it{c})");
 TString dNdmin_str = TString("#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}");
+TString poweek_str = TString("Powerweek Daten");
+TString pi0togamma_str = TString("#pi^{0} #rightarrow #gamma #gamma");
 
 
 

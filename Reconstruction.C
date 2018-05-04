@@ -3,6 +3,8 @@
 using namespace std;
 void Reconstruction(TString AddName = "") {
 
+  TLatex* poweektex = new TLatex();
+
   Float_t pi = TMath::Pi();
   std::vector<Double_t> eta_vec;
   std::vector<Double_t> phi_vec;
@@ -72,18 +74,18 @@ void Reconstruction(TString AddName = "") {
   TH2F* hSignalmix_pT = new TH2F("hSignalmix_pT","invariante Masse gegen pT (mixed events)",150,0.,0.3,100,0.,10.);
   SetHistoStandardSettings2(hSignalmix_pT);
 
-  TH2F* hWinkelAbdeckung = new TH2F("hWinkelAbdeckung","Winkelabdeckung same events",100,-1.,1.,180,-1.*pi,1.*pi);
+  TH2F* hWinkelAbdeckung = new TH2F("hWinkelAbdeckung","Winkelabdeckung same events",100,-1.,1.,180,-1.*pi,1.0001*pi);
   SetHistoStandardSettings2(hWinkelAbdeckung);
   hWinkelAbdeckung->SetXTitle("#it{#eta}");
   hWinkelAbdeckung->SetYTitle("#it{#phi}");
   hWinkelAbdeckung->GetYaxis()->SetBit(TAxis::kLabelsVert);
   hWinkelAbdeckung->GetYaxis()->SetBinLabel(1,"0");
-  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(pi.), "#pi");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(pi), "#pi");
   hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(pi/2.),"#frac{-#pi}{2}");
-  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(0),"0");
-  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(-pi.), "#pi");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(0.),"0");
+  hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(-pi), "#pi");
   hWinkelAbdeckung->GetYaxis()->SetBinLabel(hWinkelAbdeckung->GetYaxis()->FindBin(-pi/2.),"#frac{-#pi}{2}");
-  hWinkelAbdeckung->GetXaxis()->SetNdivisions(6);
+  hWinkelAbdeckung->GetXaxis()->SetNdivisions(5);
 
   TGaxis::SetMaxDigits(3);
 
@@ -303,6 +305,7 @@ void Reconstruction(TString AddName = "") {
   Double_t x_Error_ms_mm[150], y_Error_ms_mm[150];
   Double_t x_Error_ms_mm_root[150], y_Error_ms_mm_root[150];
 
+
   Int_t n = 150;
   Double_t fse[150], sse[150]; //first_scaling_error and second_scaling_error
   for (Int_t i = 0; i < n; i++) {
@@ -367,28 +370,66 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm_root->SetMarkerSize(1.5);
   grErrors_ms_mm_root->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}; #it{#sigma} (GeV/#it{c}^{2})^{-1}");
 
-  TLegend* legErrors = new TLegend(0.3,0.5,0.6,0.6);
+  TLegend* legErrors = new TLegend(0.4,0.3,0.7,0.4);
   SetLegendSettigns(legErrors);
-  legErrors->SetTextSize(0.04);
+  legErrors->SetTextSize(0.03);
   legErrors->AddEntry(grErrors_ms_mm, "self-calculated uncertainty");
   legErrors->AddEntry(grErrors_ms_mm_root, "root 5.34 calculated uncertainty");
 
+  TF1* sqrtNsame = new TF1("sqrtNsame","sqrt(x)",0.,8.e3);
+  sqrtNsame->SetLineColor(kBlue+1);
+  sqrtNsame->SetLineWidth(3);
+  TLegend* legErrorsSame = new TLegend(0.25,0.75,0.6,0.85);
+  SetLegendSettigns(legErrorsSame);
+  legErrorsSame->AddEntry(grErrors, "self-calculated uncertainty");
+  legErrorsSame->AddEntry(sqrtNsame, "#sqrt{N} fit");
+
+
+  TF1* sqrtNmixed = new TF1("sqrtNmixed", "sqrt((sqrt(x)/[0])^2+((x*[1])/[2])^2)",0.,16.e3);
+  sqrtNmixed->SetLineColor(kBlue+1);
+  sqrtNmixed->SetLineWidth(3);
+  TLegend* legErrorsMixed = new TLegend(0.25,0.75,0.6,0.85);
+  SetLegendSettigns(legErrorsMixed);
+  legErrorsMixed->AddEntry(grError_mms, "self-calculated uncertainty");
+  legErrorsMixed->AddEntry(sqrtNmixed, "#sqrt{N} fit");
 
 
   cErrors->cd();
   cErrors->SetTopMargin(0.075);
   cErrors->SetRightMargin(0.1);
+  cErrors->SetBottomMargin(0.18);
+  grErrors->GetXaxis()->SetTitleOffset(1.6);
+  grErrors->GetYaxis()->SetTitleOffset(1.4);
   grErrors->Draw("AP");
+  sqrtNsame->Draw("same");
+  legErrorsSame->Draw("same");
+  poweektex->SetTextSize(0.04);
+  poweektex->DrawLatexNDC(0.45,0.5,poweek_str);
+  poweektex->DrawLatexNDC(0.45,0.45,pi0togamma_str);
+  poweektex->SetTextSize(0.03);
+  poweektex->DrawLatexNDC(0.45,0.4,"same events");
   cErrors->Update();
 
 
   cErrors->SaveAs(Form("Reconstructed/ErrorPlot%s.png", AddName.Data()));
 
   cErrors->Clear();
+  cErrors->SetBottomMargin(0.15);
   grError_mms->Draw("AP");
+  grError_mms->GetYaxis()->SetTitleOffset(1.4);
+  grError_mms->GetXaxis()->SetTitleOffset(1.6);
+  grError_mms->Fit(sqrtNmixed,"M");
+  sqrtNmixed->Draw("same");
+  legErrorsMixed->Draw("same");
+  poweektex->SetTextSize(0.04);
+  poweektex->DrawLatexNDC(0.45,0.5,poweek_str);
+  poweektex->DrawLatexNDC(0.45,0.45,pi0togamma_str);
+  poweektex->SetTextSize(0.03);
+  poweektex->DrawLatexNDC(0.45,0.4,"mixed events");
   cErrors->SaveAs(Form("Reconstructed/MixedScaledErrorPlot%s.png", AddName.Data()));
 
   cErrors->Clear();
+  cErrors->SetRightMargin(0.07);
 
   grErrors_ms_mm->Draw("AP");
   grErrors_ms_mm_root->Draw("P");
@@ -397,6 +438,11 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm->GetXaxis()->SetTitleOffset(1.6);
   grErrors_ms_mm_root->GetXaxis()->SetTitleOffset(1.6);
   legErrors->Draw("SAMEP");
+  poweektex->SetTextSize(0.04);
+  poweektex->DrawLatexNDC(0.4,0.6,poweek_str);
+  poweektex->DrawLatexNDC(0.4,0.55,pi0togamma_str);
+  poweektex->SetTextSize(0.03);
+  poweektex->DrawLatexNDC(0.4,0.5,"same event - scaled mixed event");
   cErrors->Update();
 
   cErrors->SaveAs(Form("Reconstructed/FurtherErrorPlot%s.png", AddName.Data()));
@@ -415,11 +461,12 @@ void Reconstruction(TString AddName = "") {
   cWinkelAbdeckung->cd();
   cWinkelAbdeckung->SetRightMargin(0.175);
   cWinkelAbdeckung->SetBottomMargin(0.125);
+  cWinkelAbdeckung->SetTopMargin(0.2);
   gPad->SetLogz();
 
   hWinkelAbdeckung->GetZaxis()->SetRangeUser(1.e0,1.e4);
   hWinkelAbdeckung->Draw("colz");
-  lSignalmix_pT->DrawLatexNDC(0.35, 0.45, "Winkelabdeckung same event");
+  lSignalmix_pT->DrawLatexNDC(0.32, 0.95, "Winkelabdeckung same event");
   cWinkelAbdeckung->Update();
 
   cWinkelAbdeckung->SaveAs(Form("Reconstructed/Winkelabdeckung%s.png", AddName.Data()));
