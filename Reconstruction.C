@@ -461,7 +461,7 @@ void Reconstruction(TString AddName = "") {
   cWinkelAbdeckung->cd();
   cWinkelAbdeckung->SetRightMargin(0.175);
   cWinkelAbdeckung->SetBottomMargin(0.125);
-  cWinkelAbdeckung->SetTopMargin(0.2);
+  cWinkelAbdeckung->SetTopMargin(0.1);
   gPad->SetLogz();
 
   hWinkelAbdeckung->GetZaxis()->SetRangeUser(1.e0,1.e4);
