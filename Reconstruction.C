@@ -215,6 +215,7 @@ void Reconstruction(TString AddName = "") {
   cSignal->cd();
   cSignal->SetTopMargin(0.075);
   // hSignal->Scale(1,"width");
+  hSignal->SetYTitle("#it{N}_{#gamma #gamma}");
   hSignal->Draw("");
   lSignal->DrawLatex(0.01, 7e3, "#it{m}_{inv} same event");
 
@@ -232,6 +233,7 @@ void Reconstruction(TString AddName = "") {
   cSignalmix->cd();
   cSignalmix->SetTopMargin(0.075);
   // hSignalmix->Scale(1,"width");
+  hSignalmix->SetYTitle("#it{N}_{#gamma #gamma}");
   hSignalmix->Draw("");
   lSignalmix->DrawLatex(0.01, 14e3, "#it{m}_{inv} mixed event");
 
@@ -265,6 +267,7 @@ void Reconstruction(TString AddName = "") {
 
   cSignalSubtracted->cd();
   cSignalSubtracted->SetTopMargin(0.075);
+  cSignalSubtracted->SetLeftMargin(0.2);
 
   // gewichten der mixed events mit der ratio_fit
   TH1F* hSignalmix_clone = (TH1F*)hSignalmix->Clone("hSignalmix_clone");
@@ -273,7 +276,8 @@ void Reconstruction(TString AddName = "") {
 
   hSignal_clone->Add(hSignalmix_clone,-1);
 
-
+  hSignal_clone->SetYTitle("#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}");
+  hSignal_clone->GetYaxis()->SetTitleOffset(1.7);
   hSignal_clone->Scale(1,"width");
   hSignal_clone->Draw();
 
@@ -337,7 +341,7 @@ void Reconstruction(TString AddName = "") {
   grErrors->SetMarkerStyle(20);
   grErrors->SetMarkerSize(1.5);
 
-  grErrors->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma} (GeV/#it{c}^{2})^{-1}");
+  grErrors->SetTitle(";#it{N}_{#gamma #gamma} (GeV/#it{c}^{2})^{-1};#it{#sigma}");
 
   // Error minv mixed scaled events
   TGraph* grError_mms = new TGraph(n,x_Error_mms,y_Error_mms);
@@ -348,7 +352,7 @@ void Reconstruction(TString AddName = "") {
   grError_mms->SetMarkerColor(kRed);
   grError_mms->SetMarkerStyle(20);
   grError_mms->SetMarkerSize(1.5);
-  grError_mms->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma} (GeV/#it{c}^{2})^{-1}");
+  grError_mms->SetTitle(";#it{N}_{#gamma #gamma} (GeV/#it{c}^{2})^{-1};#it{#sigma}");
 
   // Error same - scaled mixed
   TGraph* grErrors_ms_mm = new TGraph(n,x_Error_ms_mm,y_Error_ms_mm);
@@ -358,7 +362,7 @@ void Reconstruction(TString AddName = "") {
   grErrors_ms_mm->SetMarkerColor(kRed);
   grErrors_ms_mm->SetMarkerStyle(21);
   grErrors_ms_mm->SetMarkerSize(1.5);
-  grErrors_ms_mm->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma} (GeV/#it{c}^{2})^{-1}");
+  grErrors_ms_mm->SetTitle(";#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1};#it{#sigma}");
 
   // Error same - scaled mixed by root functions
   TGraph* grErrors_ms_mm_root = new TGraph(n,x_Error_ms_mm_root,y_Error_ms_mm_root);
