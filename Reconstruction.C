@@ -111,6 +111,7 @@ void Reconstruction(TString AddName = "") {
   Float_t pz[iPufferMax][kMaxHit];
   Float_t iCluster[iPufferMax];
   Int_t iNCluster;
+  Int_t NClusterTotal = 0;
 
   // Setze Anzahl der Cluster in jedem Puffer auf null
   for (Int_t i = 0; i < iPufferMax; i++) {
@@ -123,6 +124,8 @@ void Reconstruction(TString AddName = "") {
 
     // Anzahl Cluster im Event
     iNCluster = Daten->GetClusterID(iEvt);
+    NClusterTotal += iNCluster;
+    // std::cout << "Anzahl Cluster im Event: " << iNCluster << std::endl;
 
     for (Int_t iHit=0; iHit < iNCluster; iHit++) {
       px[iPufferAktuell][iHit] = Daten->GetPX(iEvt, iHit);
@@ -209,7 +212,10 @@ void Reconstruction(TString AddName = "") {
     }
 
   }
+  std::cout << "Anzahl pi0s: " << NClusterTotal/2 << std::endl;
+
   fDaten->Close();
+
 
   // Wechsle und Zeichne minv same event
   cSignal->cd();
@@ -278,7 +284,26 @@ void Reconstruction(TString AddName = "") {
 
   hSignal_clone->SetYTitle("#frac{d#it{N}_{#gamma #gamma}}{d#it{m}_{inv}} (GeV/#it{c}^{2})^{-1}");
   hSignal_clone->GetYaxis()->SetTitleOffset(1.7);
-  hSignal_clone->Scale(1,"width");
+  //hSignal_clone->Scale(1,"width");
+
+  //TO get number of Pi0s from integrated spectrum
+  TF1* fGausFit = new TF1(Form("fGausFit"),"gaus", 0.08, 0.18);
+  hSignal_clone->Fit(Form("fGausFit"),"SIMNREQ","", 0.08, 0.18);
+
+  // hMinvSpectra[i]->Draw();
+  // fGausFit_dummy[i]->Draw("same");
+  // cplaceholder->SaveAs(Form("P_T_Spectra/P_TSpectra(%d).png",i));
+
+  Double_t mean = fGausFit->GetParameter(1);
+  Double_t sigma = fGausFit->GetParameter(2);
+  Double_t int_error = 0;
+
+  Double_t integral_value =
+  hSignal_clone->IntegralAndError(hSignal_clone->FindBin(mean-3*sigma),
+  hSignal_clone->FindBin(mean+3*sigma),int_error,"");
+
+  std::cout << "Integrate Value : " << integral_value << std::endl;
+
   hSignal_clone->Draw();
 
 
