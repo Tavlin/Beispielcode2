@@ -455,7 +455,7 @@ void Reconstruction(TString AddName = "") {
   poweektex->DrawLatexNDC(0.45,0.5,poweek_str);
   poweektex->DrawLatexNDC(0.45,0.45,pi0togamma_str);
   poweektex->SetTextSize(0.03);
-  poweektex->DrawLatexNDC(0.45,0.4,"mixed events");
+  poweektex->DrawLatexNDC(0.45,0.4,"sclaed mixed events");
   cErrors->SaveAs(Form("Reconstructed/MixedScaledErrorPlot%s.png", AddName.Data()));
 
   cErrors->Clear();
