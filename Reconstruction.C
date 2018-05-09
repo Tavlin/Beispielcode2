@@ -265,9 +265,10 @@ void Reconstruction(TString AddName = "") {
 
   // wechsle und zeichne Ratio zwischen same und mixed event
   hRatio = (TH1F*)hSignalmix->Clone("hRatio");
-  hRatio->Divide(hSignal);
-  hRatio->Fit(ratio_fit,"M","",0.2,0.3);
-  hRatio->Draw();
+  TH1F* hSignalCloneForRatio = (TH1F*) hSignal->Clone("hSignalCloneForRatio");
+  hSignalCloneForRatio->Divide(hRatio);
+  hSignalCloneForRatio->Fit(ratio_fit,"M","",0.2,0.3);
+  hSignalCloneForRatio->Draw();
   ratio_fit->Draw("l,same");
 
 
@@ -278,7 +279,7 @@ void Reconstruction(TString AddName = "") {
   // gewichten der mixed events mit der ratio_fit
   TH1F* hSignalmix_clone = (TH1F*)hSignalmix->Clone("hSignalmix_clone");
   TH1F* hSignal_clone = (TH1F*)hSignal->Clone("hSignal_clone");
-  hSignalmix_clone->Scale(1/ratio_fit->GetParameter(0));
+  hSignalmix_clone->Scale(ratio_fit->GetParameter(0));
 
   hSignal_clone->Add(hSignalmix_clone,-1);
 
@@ -344,13 +345,13 @@ void Reconstruction(TString AddName = "") {
 
     // mixed
     x_Error_mms[i] = hSignalmix->GetBinContent(i);
-    fse[i] = hSignalmix->GetBinError(i)/ratio_fit->GetParameter(0);
-    sse[i] = (hSignalmix->GetBinContent(i)*ratio_fit->GetParError(0)/(ratio_fit->GetParameter(0)*ratio_fit->GetParameter(0)));
+    fse[i] = hSignalmix->GetBinError(i)*ratio_fit->GetParameter(0);
+    sse[i] = 0.; //hSignalmix->GetBinContent(i)*ratio_fit->GetParError(0);
     y_Error_mms[i] = sqrt((fse[i]*fse[i])+(sse[i]*sse[i]));
 
     // same - scaled mixed event haendisch
     x_Error_ms_mm[i] = hSignal_clone->GetBinContent(i);
-    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]))*500;
+    y_Error_ms_mm[i] = sqrt(hSignal->GetBinContent(i)+(y_Error_mms[i])*(y_Error_mms[i]));
 
     // same - mixed event root
     x_Error_ms_mm_root[i] = hSignal_clone->GetBinContent(i);
